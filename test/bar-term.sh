@@ -60,12 +60,18 @@ contains "capture: reaches back through the scrollback" "-S -50" "$(called)"
 
 # ---- what every tab is doing, in one call ----------------------------------
 mkdir -p "$tmp/bar-term" && printf '3' > "$tmp/bar-term/1.rc"
-run states FAKE_SESSIONS="bar-term-1 bash
-bar-term-2 sleep" -- states 3
-check "states: idle with its last exit, running, and gone" "1 idle 3
-2 running -
-3 gone -" "$out"
+run states FAKE_SESSIONS="bar-term-1 bash /home/you/src
+bar-term-2 sleep /etc" -- states 3
+check "states: idle with its last exit and where it is, running, and gone" "1 idle 3 /home/you/src
+2 running - /etc
+3 gone - -" "$out"
 check "states: one tmux call for every tab, not one each" "1" "$(grep -c list-sessions "$FAKE_LOG")"
+
+# The tab strip is labelled from this, and a session outlives the widget, so a
+# path with a space in it has to survive being the last field of the line.
+rm -f "$tmp/bar-term/1.rc"   # a session that has not finished anything yet
+run states_spaces FAKE_SESSIONS="bar-term-1 bash /home/you/My Projects" -- states 1
+check "states: a path with spaces comes back whole" "1 idle - /home/you/My Projects" "$out"
 
 # ---- the rest of the verbs -------------------------------------------------
 run interrupt FAKE_SESSIONS="bar-term-1 bash" -- interrupt 1

@@ -89,7 +89,8 @@ Item {
         var t = String(line).trim()
         if (t === "notool") { svc.haveTmux = false; return }
         svc.haveTmux = true
-        // "<n> <state> <exit>", one line per tab.
+        // "<n> <state> <exit> <cwd>", one line per tab. The path is whatever
+        // is left after the first three fields, so one with spaces survives.
         var f = t.split(/\s+/)
         if (f.length < 3) return
         var i = parseInt(f[0], 10) - 1
@@ -97,6 +98,7 @@ Item {
         var s = svc.sessions[i]
         s.sessionState = f[1]
         s.lastExit = f[2] === "-" ? -1 : parseInt(f[2], 10)
+        s.cwd = f.length > 3 ? f.slice(3).join(" ") : ""
       }
     }
   }

@@ -57,13 +57,23 @@ Item {
     return history[i]
   }
 
-  // A short name for the tab strip: the command word tells one session from
-  // another at a glance ("git", "journalctl", "make").
-  property string lastCmd: ""
+  // Where the session is, which is what tells one from another at a glance and
+  // is the thing a session is actually *for*: tab 2 is the one in /etc.
+  //
+  // Taken from tmux rather than from the last command typed, because the
+  // sessions outlive the widget: after a shell restart the tabs are still
+  // there, and a label built from what this process happened to see would come
+  // back blank.
+  property string cwd: ""
   readonly property string tabLabel: {
-    var c = lastCmd.trim()
-    if (c === "") return ""
-    var w = c.split(/\s+/)[0]
-    return w.length > 8 ? w.substring(0, 8) : w
+    var c = String(cwd || "")
+    if (c === "" || c === "-") return ""
+    if (c === "/") return "/"
+    var base = c.replace(/\/+$/, "").split("/").pop()
+    if (base === "" ) return ""
+    // $HOME is where a fresh session starts, and "david" would say nothing.
+    if (c.indexOf("/home/") === 0 && c.split("/").length === 3) return "~"
+    return base.length > 9 ? base.substring(0, 9) : base
   }
+  property string lastCmd: ""
 }

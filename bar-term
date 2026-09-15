@@ -9,7 +9,7 @@
 #   bar-term ensure <n>          make session <n> exist, print its name
 #   bar-term send <n> <cmd...>   type a command into it and press Enter
 #   bar-term capture <n> [lines] print what its screen says
-#   bar-term states [count]      one line per session: "<n> idle|running|gone <exit>"
+#   bar-term states [count]      per session: "<n> idle|running|gone <exit> <cwd>"
 #   bar-term interrupt <n>       Ctrl+C into it
 #   bar-term reset <n>           clear its screen and scrollback
 #   bar-term restart <n>         kill it and make a fresh one
@@ -107,21 +107,25 @@ case "${1:-}" in
     count=${2:-4}
     # One call for every tab rather than one per tab: this runs on a timer, and
     # four processes a tick to draw four dots is not a reasonable price.
-    live=$("$TMUX_BIN" list-sessions -F '#{session_name} #{pane_current_command}' 2>/dev/null)
+    live=$("$TMUX_BIN" list-sessions -F '#{session_name} #{pane_current_command} #{pane_current_path}' 2>/dev/null)
     for n in $(seq 1 "$count"); do
       s=$(name_for "$n")
       line=$(printf '%s\n' "$live" | grep -m1 "^$s ")
       if [ -z "$line" ]; then
-        echo "$n gone -"
+        echo "$n gone - -"
         continue
       fi
-      cmd=${line#"$s" }
+      rest=${line#"$s" }
+      cmd=${rest%% *}
+      # Last field and unquoted, so a path with spaces survives: the widget
+      # takes everything after the third field as the path.
+      path=${rest#"$cmd" }
       rc=$(cat "$(rc_file "$n")" 2>/dev/null); rc=${rc:--}
       # The pane's foreground command is the shell itself exactly when nothing
       # is running in it, which is the only "busy" signal a session gives.
       case "$cmd" in
-        bash|sh|zsh|fish|-bash) echo "$n idle $rc" ;;
-        *)                      echo "$n running $rc" ;;
+        bash|sh|zsh|fish|-bash) echo "$n idle $rc $path" ;;
+        *)                      echo "$n running $rc $path" ;;
       esac
     done
     ;;
