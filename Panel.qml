@@ -22,26 +22,86 @@ Theme {
     moduleName: root.moduleName
     settings: root.settings
   }
-  readonly property string target: cfg.target
   function setting(key, fallback) { return cfg.setting(key, fallback) }
-  function writeTarget(t)         { return cfg.writeTarget(t) }
+  readonly property string workdir: cfg.workdir
 
   Service {
     id: svc
-    target: root.target
-    pollSec: cfg.pollSec
+    workdir: cfg.workdir
+    timeoutSec: cfg.timeoutSec
+    maxLines: cfg.maxLines
   }
   readonly property string toolState: svc.toolState
   readonly property var stateName: svc.stateName
-  readonly property bool online: toolState === stateName.up
-  function reprobe() { svc.reprobe() }
+  readonly property bool busy: svc.running
+  readonly property bool failed: toolState === stateName.failed
+  readonly property bool usable: toolState !== stateName.notool
+  readonly property var output: svc.output
+  readonly property int lastExit: svc.lastExit
+  readonly property int lastMs: svc.lastMs
 
-  // Fire-and-forget: each call is a detached process, so anything ordered
-  // must be one shim invocation.
+  // What the line above the prompt says about the command that just finished.
+  // Empty while nothing has run, because a fresh pad has nothing to report and
+  // an "exit 0" there would read as if something had.
+  readonly property string resultLine: svc.running ? "running…"
+    : svc.lastExit < 0 ? ""
+    : (svc.lastExit === 0 ? "ok" : "exit " + svc.lastExit) + "  ·  " + svc.lastMs + " ms"
+
+  // ---- running things ------------------------------------------------------
+
+  // Fire-and-forget: each call is a detached process, so anything ordered must
+  // be one shim invocation.
   function sh(args) {
     if (!bar || typeof bar.run !== "function") return
     bar.run(svc.shimCmd(args))
   }
+
+  // The command history, newest last, in memory only. It is not written to
+  // shell.json on purpose: that file is the widget's settings and is rewritten
+  // whole on every change, so putting a line of typing in it would mean a
+  // settings write per command.
+  property var history: []
+  property int historyAt: -1   // -1 = not walking the history, typing something new
+
+  function runCommand(cmd) {
+    var c = String(cmd || "").trim()
+    if (c === "" || !usable) return false
+    if (!svc.runCmd(c)) return false
+    if (history.length === 0 || history[history.length - 1] !== c) {
+      var h = history.slice(); h.push(c)
+      if (h.length > 100) h = h.slice(h.length - 100)
+      history = h
+    }
+    historyAt = -1
+    return true
+  }
+
+  // Walks the history and hands back what the prompt should now hold. Returns
+  // null when there is nothing in that direction, so the prompt leaves what is
+  // there rather than blanking it.
+  function recall(step) {
+    if (history.length === 0) return null
+    var i = historyAt < 0 ? history.length : historyAt
+    i += step
+    if (i < 0) i = 0
+    if (i >= history.length) { historyAt = -1; return "" }
+    historyAt = i
+    return history[i]
+  }
+
+  function killCommand()  { svc.kill() }
+  function clearOutput()  { svc.clear() }
+  // Fire-and-forget through sh(), not a callback handed to Service: passing
+  // bar.run as a value drops what it was called on.
+  function openInTerminal() {
+    var c = String(pad.promptText() || "").trim()
+    if (c !== "") sh("open " + Util.shellQuote(c))
+  }
+
+  // The pad owns the prompt, so the key table reaches it through here rather
+  // than every binding knowing about the pad's internals.
+  function submitPrompt() { pad.submit() }
+  function recallInto(step) { pad.recall(step) }
 
   Bindings { id: bindings; panel: root }
   readonly property var keyHelp: bindings.keyHelp
@@ -51,7 +111,9 @@ Theme {
   function handleKey(ev) { return bindings.handleKey(ev) }
 
   property bool opened: false
-  onOpenedChanged: if (opened) Qt.callLater(pad.focusControls)
+  // The prompt takes the keyboard as soon as the pad is up: a terminal that
+  // needs a click before it accepts typing is a terminal nobody would use.
+  onOpenedChanged: if (opened) Qt.callLater(pad.focusPrompt)
   function open()   { opened = true }
   function close()  { opened = false }
   function toggle() { opened = !opened }
@@ -69,10 +131,24 @@ Theme {
     panel: root
     anchors.centerIn: parent
     text: "󰆍"
-    color: root.online ? root.textColour : root.badColour
-    opacity: root.online ? (root.opened ? 1.0 : 0.85) : 0.9
+    // Three things worth seeing from across the screen: something is running,
+    // the last thing failed, and this machine cannot run anything at all.
+    color: !root.usable ? root.badColour
+         : root.busy ? root.okColour
+         : root.failed ? root.badColour
+         : root.textColour
+    opacity: root.opened ? 1.0 : 0.85
     font.pixelSize: 14
     Behavior on opacity { NumberAnimation { duration: 120 } }
+
+    // A command that takes a while should look like it is taking a while,
+    // rather than like a widget that has stopped answering.
+    SequentialAnimation on opacity {
+      running: root.busy
+      loops: Animation.Infinite
+      NumberAnimation { to: 0.45; duration: 600; easing.type: Easing.InOutQuad }
+      NumberAnimation { to: 1.0;  duration: 600; easing.type: Easing.InOutQuad }
+    }
   }
 
   // The bar lays its own MouseArea over every module slot for drag-to-reorder,

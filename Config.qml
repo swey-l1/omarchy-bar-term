@@ -20,9 +20,16 @@ Item {
     return fallback
   }
 
-  // What the shim acts on. Replace with your own keys; keep one reader per key.
-  readonly property string target: setting("target", "")
-  readonly property int pollSec: setting("pollSec", 60)
+  // What the shim acts on. One reader per key, each with the fallback the
+  // manifest advertises, because the manifest's defaults are not merged at
+  // runtime.
+  //
+  // An empty workdir is left empty rather than filled in with a guess: the shim
+  // answers that with $HOME, which is the one place QML cannot name and the
+  // shell always can.
+  readonly property string workdir: setting("workdir", "")
+  readonly property int timeoutSec: setting("timeoutSec", 20)
+  readonly property int maxLines: setting("maxLines", 200)
 
   // updateEntryInline REPLACES the entry with { id } plus whatever it is handed,
   // so any key omitted here is silently dropped from shell.json. Always send
@@ -35,5 +42,5 @@ Item {
     return bar.shell.updateEntryInline(moduleName, merged)
   }
 
-  function writeTarget(t) { return persist({ target: String(t || "").trim() }) }
+  function writeWorkdir(d) { return persist({ workdir: String(d || "").trim() }) }
 }

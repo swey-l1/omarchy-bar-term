@@ -13,8 +13,7 @@ Item {
 
   // The pad's surfaces and status colours, named once. Every component file
   // draws with these, and a literal repeated across five files is one that
-  // drifts the first time somebody adjusts it -- the AUTH button had already
-  // ended up a shade brighter on hover than every other button.
+  // drifts the first time somebody adjusts it.
   readonly property color surfaceIdle:        Qt.rgba(1, 1, 1, 0.04)
   readonly property color surfaceRaised:      Qt.rgba(1, 1, 1, 0.06)
   readonly property color surfaceButton:      Qt.rgba(1, 1, 1, 0.08)
@@ -32,7 +31,7 @@ Item {
   readonly property color  textColour: bar ? bar.foreground : "white"
   readonly property string fontFamily: bar ? bar.fontFamily : "monospace"
 
-  // The colour of anything clickable, so a row, a key and a list entry all
+  // The colour of anything clickable, so a key, a row and a list entry all
   // answer the pointer the same way. `rest` is what it shows when left alone;
   // the caller decides whether that is transparent, raised or marked.
   function surfaceFor(pressed, hovered, rest) {
@@ -47,24 +46,29 @@ Item {
   // where the same number means a key in one place and a list row in another and
   // nothing says which is which.
   readonly property int gap:        Style.space(6)    // between anything and its neighbour
-  readonly property int tightGap:   Style.space(4)    // between the picker's own rows
+  readonly property int tightGap:   Style.space(4)    // between the pad's own rows
   readonly property int inset:      Style.space(6)    // text away from an edge
 
-  readonly property int keyWidth:   Style.space(38)   // one button of the D-pad grid
-  readonly property int keyHeight:  Style.space(34)
+  // A pad as wide as a key grid would wrap `ls` into nonsense, so the width is
+  // set by what output has to be readable in and the keys are divided out of it
+  // rather than the other way round.
+  readonly property int padWidth:   Style.space(420)
+  readonly property int keysPerRow: 5
+  readonly property int keyWidth:   Math.floor((padWidth - gap * (keysPerRow - 1)) / keysPerRow)
+  readonly property int keyHeight:  Style.space(30)
 
-  readonly property int rowHeight:     Style.space(24)  // a picker row, a form button
-  readonly property int listRowHeight: Style.space(22)  // a row of the app list
+  readonly property int rowHeight:     Style.space(24)  // a full-width line, a form button
   readonly property int helpRowHeight: Style.space(16)  // a line of the shortcut list
-  readonly property int fieldHeight:   Style.space(26)  // a text field
+  readonly property int fieldHeight:   Style.space(28)  // the prompt
   readonly property int hintHeight:    Style.space(26)  // the hover text along the foot, two lines
 
-  readonly property int badgeWidth:  Style.space(30)   // the AUTH button on a row
-  readonly property int badgeHeight: Style.space(18)
-
-  // Both lists scroll; these bound the pad rather than letting it run off-screen.
-  readonly property int appListHeight:  Style.space(150)
+  // The scrollback. Bounded so a long-running command cannot grow the pad off
+  // the screen; it scrolls inside this instead.
+  readonly property int outputHeight:  Style.space(230)
   readonly property int helpListHeight: Style.space(120)
 
-  readonly property int padWidth: keyWidth * 3 + gap * 2
+  // Output is read as columns as often as prose (ls, ps, a stack trace), so it
+  // is the one place on the pad with a fixed-pitch face.
+  readonly property string monoFamily: "monospace"
+  readonly property int monoSize: 9
 }

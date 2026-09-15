@@ -5,14 +5,23 @@ import QtQuick
 // so a key cannot end up doing one thing and being advertised as another.
 //
 // The actions call back into the Panel, which owns the shim and the pad.
-// `mods` is matched exactly, so Shift+R and R are separate entries.
+// `mods` is matched exactly, so Ctrl+C and C are separate entries.
+//
+// This table is deliberately short and nearly all modified keys. The prompt
+// holds the keyboard whenever the pad is open, and every key it does not claim
+// is a character somebody is trying to type: bind a bare letter here and it
+// becomes impossible to type that letter into a command.
 Item {
   property var panel: null
 
   readonly property var keyMap: [
-    { id: "refresh", keys: [Qt.Key_R],                  hint: "R",        label: "Refresh",   act: function() { panel.reprobe() } },
-    { id: "run",     keys: [Qt.Key_Return, Qt.Key_Enter], hint: "Enter",  label: "Run",       act: function() { panel.sh("run") } },
-    { id: "close",   keys: [Qt.Key_Escape, Qt.Key_Q],   hint: "Esc or Q", label: "Close",     act: function() { panel.close() } }
+    { id: "run",      keys: [Qt.Key_Return, Qt.Key_Enter], hint: "Enter",  label: "Run the command",   act: function() { panel.submitPrompt() } },
+    { id: "histPrev", keys: [Qt.Key_Up],                   hint: "Up",     label: "Previous command",  act: function() { panel.recallInto(-1) } },
+    { id: "histNext", keys: [Qt.Key_Down],                 hint: "Down",   label: "Next command",      act: function() { panel.recallInto(1) } },
+    { id: "kill",     keys: [Qt.Key_C], mods: Qt.ControlModifier, hint: "Ctrl+C", label: "Stop what is running", act: function() { panel.killCommand() } },
+    { id: "clear",    keys: [Qt.Key_L], mods: Qt.ControlModifier, hint: "Ctrl+L", label: "Clear the output",     act: function() { panel.clearOutput() } },
+    { id: "terminal", keys: [Qt.Key_T], mods: Qt.ControlModifier, hint: "Ctrl+T", label: "Open it in a terminal", act: function() { panel.openInTerminal() } },
+    { id: "close",    keys: [Qt.Key_Escape],               hint: "Esc",    label: "Close",             act: function() { panel.close() } }
   ]
 
   function entryFor(id) {
@@ -27,7 +36,8 @@ Item {
   readonly property var keyHelp: keyMap.map(function (e) { return e.hint + "  " + e.label })
 
   // Returns true when the key was ours, so the caller can accept it; anything
-  // unclaimed falls through rather than being swallowed.
+  // unclaimed falls through rather than being swallowed -- which here means it
+  // reaches the prompt as a character.
   function handleKey(ev) {
     var mods = ev.modifiers & (Qt.ShiftModifier | Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier)
     for (var i = 0; i < keyMap.length; i++) {

@@ -56,7 +56,10 @@ FocusScope {
       PadText {
         panel: f.panel
         anchors.verticalCenter: parent.verticalCenter
-        visible: fi.text.length === 0 && !fi.activeFocus
+        // On empty, not on empty-and-unfocused: this field holds the keyboard
+        // for as long as the pad is open, so hiding it on focus would mean
+        // never showing it.
+        visible: fi.text.length === 0
         text: f.placeholder
         opacity: 0.35
         font.pixelSize: fi.font.pixelSize

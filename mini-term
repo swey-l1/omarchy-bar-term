@@ -1,34 +1,58 @@
 #!/usr/bin/env bash
-# omarchy-launch-terminal shim for the Mini Terminal bar widget. The widget shells out here; this
-# script owns every call to omarchy-launch-terminal, so it is usable from a terminal without
-# the shell running and testable alone (test/mini-term.sh).
+# The command runner behind the Mini Terminal bar widget. The widget shells out
+# here; this script owns running the command, bounding it, and handing it off to
+# a real terminal, so it is usable from a terminal without the shell running and
+# testable alone (test/mini-term.sh).
 #
-#   mini-term status         "up" / "down" / "notool"
-#   mini-term run [args...]  run omarchy-launch-terminal against $TARGET with the given args
+#   mini-term status              "up" / "notool"
+#   mini-term run <command...>    run it, stream stdout and stderr, exit with its status
+#   mini-term open <command...>   hand it to a real terminal that outlives the pad
 #
-# $TARGET is what the widget configured; add a sensible fallback for hand use.
+# The shell is not looked up through PATH under a name the test could shadow: it
+# is $MINI_TERM_SHELL, so a test can point one invocation at a fake without
+# rewriting PATH for the coreutils this script itself runs.
 set -uo pipefail
 
-TARGET="${TARGET:-}"
+SHELL_BIN="${MINI_TERM_SHELL:-/bin/bash}"
+# Where commands run. The widget passes its configured directory; a bare shell
+# invocation gets $HOME, which is what a terminal would have opened in.
+WORKDIR="${WORKDIR:-$HOME}"
+# A command that never returns would otherwise hold the pad's process open for
+# the rest of the session. 124 is what timeout reports, and the widget says so.
+TIMEOUT="${TIMEOUT:-20}"
+# The pad shows a few dozen lines; a runaway `yes` should not be allowed to fill
+# memory on the way to being thrown away.
+MAXBYTES="${MAXBYTES:-65536}"
 
-if ! command -v omarchy-launch-terminal >/dev/null 2>&1; then
-  # Reported rather than fatal so the widget can show a distinct state.
-  [ "${1-}" = "status" ] && { echo notool; exit 0; }
-  echo "omarchy-launch-terminal not found" >&2
-  exit 127
-fi
-
-# The word the widget reads. Takes the check that means "up".
-report() {
-  if "$@"; then echo up; else echo down; fi
-}
-
-# Replace with what "reachable" means for omarchy-launch-terminal and $TARGET; until then a
-# fresh scaffold reports up so the icon starts in the normal colour.
-reachable() { true; }
+usage() { echo "usage: mini-term {status|run <command...>|open <command...>}" >&2; exit 2; }
 
 case "${1:-}" in
-  status) report reachable ;;
-  run)    shift; omarchy-launch-terminal "$@" ;;
-  *)      echo "usage: mini-term {status|run [args...]}" >&2; exit 2 ;;
+  status)
+    # The shell is the only thing `run` needs; the terminal launcher matters
+    # only to `open`, so its absence is not the widget's normal state.
+    [ -x "$SHELL_BIN" ] && echo up || echo notool
+    ;;
+
+  run)
+    shift; [ $# -gt 0 ] || usage
+    cd "$WORKDIR" 2>/dev/null || { echo "mini-term: cannot enter $WORKDIR" >&2; exit 2; }
+    # -l so the command sees the PATH a terminal would give it; 2>&1 because the
+    # pad has one output pane and interleaved is the order things happened in.
+    # --foreground lets timeout signal a command that is not in its own process
+    # group. head bounds the output and closes the pipe, which stops the
+    # producer too. PIPESTATUS[0] is the command's status, not head's.
+    timeout --foreground "$TIMEOUT" "$SHELL_BIN" -lc "$*" 2>&1 | head -c "$MAXBYTES"
+    exit "${PIPESTATUS[0]}"
+    ;;
+
+  open)
+    shift; [ $# -gt 0 ] || usage
+    command -v omarchy-launch-terminal >/dev/null 2>&1 || {
+      echo "mini-term: omarchy-launch-terminal not found" >&2; exit 127; }
+    # `exec bash -l` at the end keeps the window up afterwards: the point of
+    # handing off is to read or carry on with what the command left behind.
+    omarchy-launch-terminal bash -lc "cd $(printf %q "$WORKDIR"); $*; exec bash -l"
+    ;;
+
+  *) usage ;;
 esac
