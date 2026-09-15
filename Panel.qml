@@ -43,9 +43,23 @@ Theme {
   // What the line above the prompt says about the command that just finished.
   // Empty while nothing has run, because a fresh pad has nothing to report and
   // an "exit 0" there would read as if something had.
+  //
+  // 143 and 124 are the shim's own doing rather than the command's verdict, and
+  // reporting them as an exit status asks the reader to know what a SIGTERM is
+  // numbered.
   readonly property string resultLine: svc.running ? "running…"
     : svc.lastExit < 0 ? ""
-    : (svc.lastExit === 0 ? "ok" : "exit " + svc.lastExit) + "  ·  " + svc.lastMs + " ms"
+    : (svc.lastExit === 0 ? "ok"
+     : svc.lastExit === 143 ? "stopped"
+     : svc.lastExit === 124 ? "timed out after " + cfg.timeoutSec + "s"
+     : "exit " + svc.lastExit) + "  ·  " + svc.lastMs + " ms"
+
+  // Amber for the two the widget did itself, red only for a command that
+  // actually failed: a stop the user asked for is not bad news.
+  readonly property color resultColour:
+      svc.running || svc.lastExit <= 0 ? textColour
+    : svc.lastExit === 143 || svc.lastExit === 124 ? warnColour
+    : badColour
 
   // ---- running things ------------------------------------------------------
 

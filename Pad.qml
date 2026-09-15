@@ -110,9 +110,7 @@ KeyboardPanel {
         anchors.verticalCenter: parent.verticalCenter
         panel: pad.panel
         text: panel.resultLine
-        color: panel.busy ? panel.textColour
-             : panel.lastExit > 0 ? panel.badColour
-             : panel.textColour
+        color: panel.resultColour
         opacity: 0.7
         font.pixelSize: 9
       }

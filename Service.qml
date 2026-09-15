@@ -103,10 +103,11 @@ Item {
     onExited: function(exitCode, exitStatus) {
       svc.lastMs = Date.now() - svc.startedAt
       svc.lastExit = exitCode
-      // 124 is timeout's, and the pad would otherwise show it as an ordinary
-      // non-zero exit with no hint that nothing was wrong with the command.
-      if (exitCode === 124) svc.append("mini-term: stopped after " + svc.timeoutSec + "s")
-      svc.toolState = exitCode === 0 ? svc.stateName.idle : svc.stateName.failed
+      if (exitCode === 124) svc.append("mini-term: timed out after " + svc.timeoutSec + "s")
+      // A command the user stopped is not a failure, so the bar icon stays as it
+      // was rather than going urgent over something that was asked for.
+      svc.toolState = (exitCode === 0 || exitCode === 143) ? svc.stateName.idle
+                    : svc.stateName.failed
     }
   }
 
