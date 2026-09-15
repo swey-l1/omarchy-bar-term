@@ -8,8 +8,9 @@ An Omarchy shell plugin: a bar widget that runs a command and shows what it said
 id `io.github.swey-l1.bar-term`, kind `bar-widget`. Everything that executes anything is
 in the `bar-term` script; the QML only asks it for things.
 
-- `Panel.qml`: the bar widget: the icon, the command history, and the model everything
-  reads through `panel`. It *is* a `Theme.qml`, which holds palette and metrics.
+- `Panel.qml`: the bar widget: the icon, the sessions and which tab is active, and the
+  model everything reads through `panel`. It *is* a `Theme.qml`, which holds palette and
+  metrics.
 - `Pad.qml`: the popup: scrollback, prompt, keys, tab strip, hint line, key catcher.
 - `TabButton.qml`: one tab in that strip, and the three things it has to show.
 - `Bindings.qml`: `keyMap`, the single definition of every key binding.
@@ -29,7 +30,7 @@ in the `bar-term` script; the QML only asks it for things.
 ```sh
 ./bar-term status                        # up | notool
 WORKDIR=/tmp ./bar-term run ls           # what the widget does, from a terminal
-./test/bar-term.sh                       # 15 cases, no compositor needed
+./test/bar-term.sh                       # 16 cases, no compositor needed
 /usr/lib/qt6/bin/qmllint *.qml 2>&1 | grep -E '^Error'
 omarchy plugin validate .
 omarchy plugin update io.github.swey-l1.bar-term --yes       # pull commits into the install

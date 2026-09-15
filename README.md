@@ -4,7 +4,7 @@ A command line in the Omarchy bar. Click the icon, type a command, read what it 
 carry on with whatever you were doing.
 
 <p align="center">
-  <img src="docs/pad.png" alt="The pad: a command and its output, with the result line beneath" width="420">
+  <img src="docs/pad.png" alt="The pad: a command and its output, the result line, and the tab strip" width="420">
 </p>
 
 It is for the commands that are not worth a terminal window: a `git log`, a `df -h`, a
@@ -56,7 +56,7 @@ The prompt has the keyboard as soon as the pad opens, so you can type straight a
 Everything else you press is typing, which is why the list above is mostly modified keys.
 
 <p align="center">
-  <img src="docs/shortcuts.png" alt="The pad with the keyboard shortcut list open" width="420">
+  <img src="docs/shortcuts.png" alt="The pad with every keyboard shortcut listed" width="420">
 </p>
 
 **Ctrl+T** is the way out of the pad's limits: it hands what you typed to a real terminal,
