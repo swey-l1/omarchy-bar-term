@@ -1,20 +1,26 @@
 # Bar Terminal
 
-A command line in the Omarchy bar. Click the icon, type a command, read what it said, and
-carry on with whatever you were doing.
+A terminal session in the Omarchy bar. Click the icon, type a command, read what it said,
+and carry on with whatever you were doing. Each tab is a real shell that stays where you
+left it, and any of them can be opened in a terminal window without losing its place.
 
 <p align="center">
   <img src="docs/pad.png" alt="The pad: a command and its output, the result line, and the tab strip" width="420">
 </p>
 
-It is for the commands that are not worth a terminal window: a `git log`, a `df -h`, a
+It is for the commands that are not worth opening a window for: a `git log`, a `df -h`, a
 `systemctl status`, the thing you want to check without losing the window you are in. The
 icon tells you how the last one went from across the screen.
+
+Behind each tab is a tmux session, so it behaves like the terminal it is: `cd` sticks, the
+environment stays, and the session outlives the widget. Restart the shell, or log back in
+tomorrow, and your tabs are where you left them.
 
 ## Requirements
 
 - Omarchy with the Quickshell-based shell (`omarchy-shell`)
-- `omarchy-launch-terminal`, for handing a command to a real terminal
+- `tmux`, which is what each tab actually is
+- `omarchy-launch-terminal`, for opening a session in a terminal window
 
 ## Install
 
@@ -46,9 +52,10 @@ The prompt has the keyboard as soon as the pad opens, so you can type straight a
 | `Enter` | Run the command |
 | `Up` | Previous command |
 | `Down` | Next command |
-| `Ctrl+C` | Stop what is running |
-| `Ctrl+L` | Clear the output |
-| `Ctrl+T` | Open it in a terminal |
+| `Ctrl+C` | Interrupt the session |
+| `Ctrl+L` | Clear the screen |
+| `Ctrl+T` | Attach it to a terminal |
+| `Ctrl+K` | Restart this session |
 | `Tab` | Next tab |
 | `Alt+1` … `Alt+4` | Jump to a tab |
 | `Esc` | Close |
@@ -59,19 +66,25 @@ Everything else you press is typing, which is why the list above is mostly modif
   <img src="docs/shortcuts.png" alt="The pad with every keyboard shortcut listed" width="420">
 </p>
 
-**Ctrl+T** is the way out of the pad's limits: it hands what you typed to a real terminal,
-in the same directory, and leaves a shell open there afterwards. The pad closes as it
-goes, because it covers the screen and the new window would otherwise open behind it. Use
-it for anything interactive, anything that wants a password, and anything that will take a
-while. On an empty prompt it just gives you a terminal in the working directory.
+**Ctrl+T** opens a terminal window *attached to the session you are looking at*, not a new
+shell: the window comes up showing exactly what the pad was showing, half-finished command
+and all. The pad closes as it goes, because it covers the screen and the new window would
+otherwise open behind it. Closing that window detaches; the session, and everything
+running in it, carries on.
+
+That is the way out of the pad's limits. The pad is a one-line prompt and a text view, so
+a full-screen program (`vim`, `htop`, a pager) is worth attaching for; anything that needs
+a password or asks a question can be answered either place.
 
 ## Tabs
 
-The strip along the foot is one session per tab: its own scrollback, its own history, and
-its own half-typed line, so switching away and back puts you exactly where you were. A tab
-is labelled with the last command word it ran, shows a pulsing dot while something is
-running in it, and turns the urgent colour if that something failed while you were
-looking elsewhere.
+The strip along the foot is one tmux session per tab, named `bar-term-1` upwards, each
+with its own directory, environment, history and half-typed line. A tab is labelled with
+the last command word it ran, shows a pulsing dot while something is running in it, and
+turns the urgent colour if that something failed while you were looking elsewhere.
+
+`Ctrl+K` throws a session away and starts it again, for when one has been left in a state
+you would rather not untangle.
 
 The bar icon watches all of them: it pulses while *any* tab is running, which is the one
 thing the bar can tell you that the pad cannot.
@@ -88,16 +101,20 @@ A command you stopped yourself does not count as a failure.
 
 ## Limits worth knowing
 
-Each command runs on its own: there is no session, so `cd` in one command does not affect
-the next, and nothing is interactive. A command that produces more than 64 KB is cut off,
-and one that runs longer than the timeout is stopped along with everything it started.
+The pad reads the session's screen a few times a second and draws it as plain text, so it
+is a good window onto a shell and a poor one onto a full-screen program: colours, cursor
+positioning and anything that redraws itself will look flat or half-finished. Attach with
+`Ctrl+T` for those.
+
+It is also a one-line prompt. Multi-line editing, and keys that belong to the shell rather
+than to the pad, happen in the attached terminal.
 
 <p align="center">
   <img src="docs/stopped.png" alt="A stopped command, reported in the scrollback and on the result line" width="420">
 </p>
 
-These are deliberate: the pad is for looking something up, and `Ctrl+T` is there for
-everything else.
+Neither is a limit on what you can run: the session is a real shell, and `Ctrl+T` is
+always one key away.
 
 ## Settings
 
@@ -105,25 +122,26 @@ Set these in `~/.config/omarchy/shell.json`, under this widget's entry in the ba
 
 | Key | Default | What |
 |---|---|---|
-| `workdir` | your home directory | Where commands run |
-| `timeoutSec` | `20` | Stop a command after this long |
-| `maxLines` | `200` | How much scrollback to keep |
+| `workdir` | your home directory | Where a new session starts; after that the session decides |
+| `maxLines` | `200` | How far back into the session's scrollback the pad reads |
 | `tabs` | `4` | How many sessions the strip holds (1-6) |
 
 ```json
-{ "id": "io.github.swey-l1.bar-term", "workdir": "/home/you/src", "timeoutSec": 60, "tabs": 3 }
+{ "id": "io.github.swey-l1.bar-term", "workdir": "/home/you/src", "tabs": 3 }
 ```
 
 ## How it works
 
-The QML never runs anything itself. `bar-term`, a plain bash script, owns running the
-command, bounding its output and its time, and handing it off to a terminal; the widget
-shells out to it and reads what comes back. That is also the only part with tests
-(`./test/bar-term.sh`, 16 cases against a fake shell), because it is the only part that
-can be tested without a compositor.
+The QML never runs anything itself. `bar-term`, a plain bash script, owns every
+conversation with tmux: making a session, typing into it, reading its screen back,
+interrupting it, and attaching a terminal to it. The widget shells out to that script and
+polls. It is also the only part with tests (`./test/bar-term.sh`, 23 cases against a fake
+tmux), because it is the only part that can be tested without a compositor.
 
-Commands run through a login shell, so they see the same `PATH` a terminal would give
-them, with stdout and stderr interleaved in the order things actually happened.
+Each session runs `bash` with an rc file that sources your own `~/.bashrc` and adds one
+thing: a `PROMPT_COMMAND` entry that writes the last exit status to a file. That is how
+the pad knows a command failed without printing anything you would see, in the pad or in
+an attached terminal.
 
 ## Developing
 

@@ -4,9 +4,9 @@ Contributor notes. Not `CLAUDE.md`: the plugin marketplace refuses a tracked one
 an installed plugin. For Claude Code, a gitignored one-line `CLAUDE.md` containing
 `@DEVELOPING.md` imports this file (a symlink would fail `omarchy plugin validate`).
 
-An Omarchy shell plugin: a bar widget that runs a command and shows what it said. Plugin
-id `io.github.swey-l1.bar-term`, kind `bar-widget`. Everything that executes anything is
-in the `bar-term` script; the QML only asks it for things.
+An Omarchy shell plugin: a bar widget whose tabs are tmux sessions. Plugin id
+`io.github.swey-l1.bar-term`, kind `bar-widget`. Everything that talks to tmux is in the
+`bar-term` script; the QML types into sessions and reads their screens back through it.
 
 - `Panel.qml`: the bar widget: the icon, the sessions and which tab is active, and the
   model everything reads through `panel`. It *is* a `Theme.qml`, which holds palette and
@@ -15,9 +15,10 @@ in the `bar-term` script; the QML only asks it for things.
 - `TabButton.qml`: one tab in that strip, and the three things it has to show.
 - `Bindings.qml`: `keyMap`, the single definition of every key binding.
 - `Config.qml`: the widget's `shell.json` entry, read and written (`setting`, `persist`).
-- `Service.qml`: **one session**: its process, output, result, history and half-typed
-  line. The Panel holds one per tab through an `Instantiator`; there is no single
-  "the service".
+- `Service.qml`: the process layer. Owns one `Session` per tab, every call to the shim,
+  and the two pollers.
+- `Session.qml`: one tab's data -- its screen, state, last exit, history and half-typed
+  line. Nothing here shells out.
 - `PadKey.qml`, `Action.qml`, `Field.qml`, `FormButton.qml`, `HintArea.qml`,
   `PadText.qml`: the pieces. Each takes `panel`; theme values and metrics come from it.
 - `bar-term`: a plain bash script that runs the command, bounds it and hands it off.
@@ -28,9 +29,12 @@ in the `bar-term` script; the QML only asks it for things.
 ## Commands
 
 ```sh
-./bar-term status                        # up | notool
-WORKDIR=/tmp ./bar-term run ls           # what the widget does, from a terminal
-./test/bar-term.sh                       # 16 cases, no compositor needed
+./bar-term status                        # up | notool (is tmux installed)
+./bar-term send 1 'ls -la'               # what the widget does, from a terminal
+./bar-term capture 1 40                  # what the pad would be showing
+./bar-term states 4                      # one line per tab: idle | running | gone
+tmux attach -t bar-term-1                # the session itself, no widget involved
+./test/bar-term.sh                       # 23 cases against a fake tmux
 /usr/lib/qt6/bin/qmllint *.qml 2>&1 | grep -E '^Error'
 omarchy plugin validate .
 omarchy plugin update io.github.swey-l1.bar-term --yes       # pull commits into the install
@@ -53,32 +57,44 @@ pad; restart the shell.
 
 ## What this plugin learned the hard way
 
-- **Stopping means killing a process group.** Quickshell terminates only the process it
-  started, so terminating the shim used to leave the command, its shell and its children
-  running with nothing able to reach them. The shim runs the command as a background job
-  with job control on, which gives it a group of its own, and both the stop path and the
-  timeout take that group down. `timeout(1)` cannot do this job: it puts *itself* in a new
-  group and survived the kill meant for it, which is why a watchdog does the timing out.
+- **The sessions are the product; the widget is a view onto them.** Each tab is the tmux
+  session `bar-term-<n>`. They outlive the shell, the widget and this process, which is
+  the point: a restart loses nothing, and `tmux attach -t bar-term-1` in any terminal is
+  the same session the pad is showing. Nothing here should ever kill a session the user
+  did not ask to lose.
+- **A new pane is not a ready shell.** Keys sent before the shell has read anything are
+  echoed raw by the pty and then read back as input, which showed up as the first command
+  of a session appearing twice. `#{pane_current_command}` is no help -- it says `bash`
+  from the moment the pane exists -- so `ensure` waits for the prompt to be drawn, by
+  capturing until the pane is not blank.
+- **Poll for every tab at once.** `states` answers for all of them in one tmux call, and
+  only the visible tab has its screen captured. This runs on a timer all day; four
+  processes a tick to draw four dots is not a price worth paying.
+- **Exit status comes from the session's own shell.** `session-rc.bash` sources the user's
+  `~/.bashrc` and prepends one entry to `PROMPT_COMMAND` that writes `$?` to a file under
+  `$XDG_RUNTIME_DIR/bar-term/`. It must stay invisible: the user can be attached to that
+  session in a terminal, and anything it printed would be theirs to look at.
 - **The prompt holds the keyboard the whole time the pad is open.** So `keyMap` is nearly
   all modified keys: bind a bare letter and that letter becomes impossible to type into a
   command. Enter, Up, Down and Esc are the exceptions, and they are keys a one-line field
   has no use for.
 - **Quoting crosses two layers.** What is typed goes through `bash -c` (Quickshell's
-  Process) and then through `"$*"` in the shim to `bash -lc`. `Util.shellQuote` on the
-  whole command line is what keeps pipes and quotes intact; test with
-  `printf 'a\nb\n'` and a pipeline before believing a change here.
+  Process) and then through `"$*"` in the shim into `tmux send-keys -l`, which types it
+  literally. `Util.shellQuote` on the whole command line is what keeps pipes and quotes
+  intact; test with a pipeline and an embedded quote before believing a change here.
 - **The pad's layer surface covers the screen.** Anything the widget opens -- a terminal,
   a window, a dialog -- appears *behind* it, so the pad has to close on the way out or the
   action looks like it did nothing. That is what "open in terminal does not work" turned
   out to be: it worked every time, invisibly.
-- **A tab is a session, or it is decoration.** Scrollback, history, draft and process all
-  belong to `Service`, and the Panel keeps one instance per tab. The list of them is
-  maintained in `onObjectAdded`/`onObjectRemoved` rather than read back with
-  `Instantiator.objectAt()`, which is a plain function: a binding on it would not
-  re-evaluate when the active tab changed.
-- **Output is bounded in three places** and needs to stay that way: `MAXBYTES` in the shim
-  stops a runaway producer, `maxLines` in Service bounds what is held, and the scrollback
-  has a fixed height so the pad cannot grow off the screen.
+- **A tab is a session, or it is decoration.** Screen, history and draft belong to
+  `Session`, one instance per tab. The list of them is maintained in
+  `onObjectAdded`/`onObjectRemoved` rather than read back with `Instantiator.objectAt()`,
+  which is a plain function: a binding on it would not re-evaluate when the active tab
+  changed.
+- **Output is bounded by what is read, not by what is produced.** tmux keeps the
+  scrollback; the pad asks for the last `maxLines` of it and draws that in a view of fixed
+  height. A command that floods the session is the session's business, exactly as it would
+  be in a terminal.
 
 ## Hard rules
 
@@ -89,6 +105,10 @@ pad; restart the shell.
 - `bar.showTooltip` does nothing from inside the pad; use the hint line.
 - `updateEntryInline` replaces the entry; always merge current settings.
 - Never write nerd-font glyphs as `\u` escapes; use the literal character.
+- `-t =name` is an exact-match *session* target. Pane targets (`send-keys`, `capture-pane`,
+  `clear-history`) take the plain name; with `=` they fail with "can't find pane".
+- Anything printed into a session is something the user may be sitting in front of. Keep
+  the widget's bookkeeping out of the pane.
 - A new key means a new `keyMap` entry, a new row in the README's key table, and a
   retaken shortcuts screenshot: the list in the pad is generated from the table, so those
   three are the same fact written three times and they drift silently.
