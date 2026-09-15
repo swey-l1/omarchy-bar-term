@@ -36,13 +36,42 @@ case "${1:-}" in
   run)
     shift; [ $# -gt 0 ] || usage
     cd "$WORKDIR" 2>/dev/null || { echo "mini-term: cannot enter $WORKDIR" >&2; exit 2; }
+
+    # Everything the command starts has to be stoppable, both when the widget
+    # says stop and when it runs too long. Both are the same act -- take down the
+    # whole process group -- so the command runs as a background job with job
+    # control on, which gives it a group of its own, and a watchdog does the
+    # timing out rather than timeout(1). timeout was the first attempt and it
+    # puts *itself* in a new group, so terminating this script left it, and the
+    # command under it, running with nothing able to reach them.
+    set -m
+    rc_file=$(mktemp); to_flag=$(mktemp -u)
     # -l so the command sees the PATH a terminal would give it; 2>&1 because the
     # pad has one output pane and interleaved is the order things happened in.
-    # --foreground lets timeout signal a command that is not in its own process
-    # group. head bounds the output and closes the pipe, which stops the
-    # producer too. PIPESTATUS[0] is the command's status, not head's.
-    timeout --foreground "$TIMEOUT" "$SHELL_BIN" -lc "$*" 2>&1 | head -c "$MAXBYTES"
-    exit "${PIPESTATUS[0]}"
+    # head bounds the output and closes the pipe, which stops the producer too.
+    { "$SHELL_BIN" -lc "$*" 2>&1; echo $? >"$rc_file"; } | head -c "$MAXBYTES" &
+    job=$!
+    pgid=$(ps -o pgid= -p "$job" 2>/dev/null | tr -d ' ')
+    stop() { [ -n "${pgid:-}" ] && kill -TERM -"$pgid" 2>/dev/null; }
+    # The watchdog is a group leader in its own right, so it is taken down as a
+    # group too: killing just the subshell would leave the sleep inside it, and
+    # an orphaned sleep per stopped command adds up over a session.
+    unwatch() { [ -n "${watchdog:-}" ] && kill -TERM -"$watchdog" 2>/dev/null; }
+    # 143 is what a process terminated by SIGTERM reports, which is what this
+    # became; the widget reads it as stopped rather than as the command's verdict.
+    trap 'stop; unwatch; rm -f "$rc_file" "$to_flag"; exit 143' TERM INT HUP
+
+    # Its own group (job control again), so stopping the command does not stop
+    # the thing that is timing it.
+    ( sleep "$TIMEOUT"; : >"$to_flag"; stop ) &
+    watchdog=$!
+
+    wait "$job" 2>/dev/null
+    unwatch; wait "$watchdog" 2>/dev/null
+
+    if [ -e "$to_flag" ]; then rm -f "$to_flag" "$rc_file"; exit 124; fi
+    rc=$(cat "$rc_file" 2>/dev/null); rm -f "$rc_file"
+    exit "${rc:-1}"
     ;;
 
   open)

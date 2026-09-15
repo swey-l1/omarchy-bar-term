@@ -58,6 +58,19 @@ check "run: asks the shell for a login shell and the command" "-lc echo hi" "$(c
 run noargs -- run
 check "run: nothing to run is a usage error" "2" "$status"
 
+# The widget stops a command by terminating the shim, and what has to die with
+# it is the whole tree the command started, not just the shim. This is the case
+# that was failing live: Ctrl+C on a sleep left the sleep running.
+marker="mini-term-test-$$"
+"$shim" run "sleep 23 # $marker" >/dev/null 2>&1 &
+shim_pid=$!
+for _ in 1 2 3 4 5 6 7 8 9 10; do pgrep -f "$marker" >/dev/null && break; sleep 0.2; done
+kill -TERM "$shim_pid" 2>/dev/null
+for _ in 1 2 3 4 5 6 7 8 9 10; do pgrep -f "$marker" >/dev/null || break; sleep 0.2; done
+left=$(pgrep -f "$marker" | wc -l)
+wait "$shim_pid" 2>/dev/null
+check "run: stopping the shim stops what it started" "0" "$left"
+
 # ---- open -----------------------------------------------------------------
 run open WORKDIR="$tmp" -- open htop
 contains "open: hands the command to a terminal" "cd $tmp; htop" "$(called)"
