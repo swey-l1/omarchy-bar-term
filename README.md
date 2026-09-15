@@ -5,7 +5,7 @@ and carry on with whatever you were doing. Each tab is a real shell that stays w
 left it, and any of them can be opened in a terminal window without losing its place.
 
 <p align="center">
-  <img src="docs/pad.png" alt="The pad: a command and its output, the result line, and the tab strip" width="420">
+  <img src="docs/pad.png" alt="The pad: a session's screen, its result line, and the tab strip along the foot" width="420">
 </p>
 
 It is for the commands that are not worth opening a window for: a `git log`, a `df -h`, a
@@ -110,7 +110,7 @@ It is also a one-line prompt. Multi-line editing, and keys that belong to the sh
 than to the pad, happen in the attached terminal.
 
 <p align="center">
-  <img src="docs/stopped.png" alt="A stopped command, reported in the scrollback and on the result line" width="420">
+  <img src="docs/running.png" alt="A command running in tab 3: the result line says so and the tab keeps a dot" width="420">
 </p>
 
 Neither is a limit on what you can run: the session is a real shell, and `Ctrl+T` is
