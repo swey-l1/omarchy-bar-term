@@ -73,7 +73,9 @@ Item {
     if (base === "" ) return ""
     // $HOME is where a fresh session starts, and "david" would say nothing.
     if (c.indexOf("/home/") === 0 && c.split("/").length === 3) return "~"
-    return base.length > 9 ? base.substring(0, 9) : base
+    // Trimmed from the front: the end of a directory name is the part that
+    // tells it apart ("…bar-term" beats "omarchy-b").
+    return base.length > 10 ? "…" + base.substring(base.length - 9) : base
   }
   property string lastCmd: ""
 }
