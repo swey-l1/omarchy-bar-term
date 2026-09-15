@@ -103,7 +103,12 @@ Item {
     onExited: function(exitCode, exitStatus) {
       svc.lastMs = Date.now() - svc.startedAt
       svc.lastExit = exitCode
+      // Noted in the scrollback as well as on the result line, because the
+      // result line is about the last command only: without this, a stopped
+      // command is a prompt echo with no output and no reason given once the
+      // next one has run.
       if (exitCode === 124) svc.append("mini-term: timed out after " + svc.timeoutSec + "s")
+      else if (exitCode === 143) svc.append("mini-term: stopped")
       // A command the user stopped is not a failure, so the bar icon stays as it
       // was rather than going urgent over something that was asked for.
       svc.toolState = (exitCode === 0 || exitCode === 143) ? svc.stateName.idle
