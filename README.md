@@ -49,6 +49,8 @@ The prompt has the keyboard as soon as the pad opens, so you can type straight a
 | `Ctrl+C` | Stop what is running |
 | `Ctrl+L` | Clear the output |
 | `Ctrl+T` | Open it in a terminal |
+| `Tab` | Next tab |
+| `Alt+1` … `Alt+4` | Jump to a tab |
 | `Esc` | Close |
 
 Everything else you press is typing, which is why the list above is mostly modified keys.
@@ -58,8 +60,21 @@ Everything else you press is typing, which is why the list above is mostly modif
 </p>
 
 **Ctrl+T** is the way out of the pad's limits: it hands what you typed to a real terminal,
-in the same directory, and leaves a shell open there afterwards. Use it for anything
-interactive, anything that wants a password, and anything that will take a while.
+in the same directory, and leaves a shell open there afterwards. The pad closes as it
+goes, because it covers the screen and the new window would otherwise open behind it. Use
+it for anything interactive, anything that wants a password, and anything that will take a
+while. On an empty prompt it just gives you a terminal in the working directory.
+
+## Tabs
+
+The strip along the foot is one session per tab: its own scrollback, its own history, and
+its own half-typed line, so switching away and back puts you exactly where you were. A tab
+is labelled with the last command word it ran, shows a pulsing dot while something is
+running in it, and turns the urgent colour if that something failed while you were
+looking elsewhere.
+
+The bar icon watches all of them: it pulses while *any* tab is running, which is the one
+thing the bar can tell you that the pad cannot.
 
 ## What the icon says
 
@@ -93,9 +108,10 @@ Set these in `~/.config/omarchy/shell.json`, under this widget's entry in the ba
 | `workdir` | your home directory | Where commands run |
 | `timeoutSec` | `20` | Stop a command after this long |
 | `maxLines` | `200` | How much scrollback to keep |
+| `tabs` | `4` | How many sessions the strip holds (1-6) |
 
 ```json
-{ "id": "io.github.swey-l1.bar-term", "workdir": "/home/you/src", "timeoutSec": 60 }
+{ "id": "io.github.swey-l1.bar-term", "workdir": "/home/you/src", "timeoutSec": 60, "tabs": 3 }
 ```
 
 ## How it works
@@ -103,7 +119,7 @@ Set these in `~/.config/omarchy/shell.json`, under this widget's entry in the ba
 The QML never runs anything itself. `bar-term`, a plain bash script, owns running the
 command, bounding its output and its time, and handing it off to a terminal; the widget
 shells out to it and reads what comes back. That is also the only part with tests
-(`./test/bar-term.sh`, 15 cases against a fake shell), because it is the only part that
+(`./test/bar-term.sh`, 16 cases against a fake shell), because it is the only part that
 can be tested without a compositor.
 
 Commands run through a login shell, so they see the same `PATH` a terminal would give

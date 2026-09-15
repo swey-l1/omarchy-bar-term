@@ -72,6 +72,9 @@ wait "$shim_pid" 2>/dev/null
 check "run: stopping the shim stops what it started" "0" "$left"
 
 # ---- open -----------------------------------------------------------------
+run opennoargs WORKDIR="$tmp" -- open
+contains "open: no command still opens a terminal there" "cd $tmp" "$(called)"
+
 run open WORKDIR="$tmp" -- open htop
 contains "open: hands the command to a terminal" "cd $tmp; htop" "$(called)"
 contains "open: leaves a shell behind afterwards" "exec bash -l" "$(called)"
