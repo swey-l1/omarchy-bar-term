@@ -3,10 +3,10 @@
 # it asked the shell and the terminal launcher to do. The only half of the
 # plugin that can be tested without a compositor, so it is.
 #
-#   ./test/mini-term.sh          # exit 0 when every case passes
+#   ./test/bar-term.sh          # exit 0 when every case passes
 set -u
 here=$(cd "$(dirname "$0")" && pwd)
-shim="$here/../mini-term"
+shim="$here/../bar-term"
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
 pass=0; fail=0
 
@@ -24,7 +24,7 @@ contains() { case "$3" in *"$2"*) pass=$((pass+1));; *) fail=$((fail+1)); printf
 # ---- status ---------------------------------------------------------------
 run status_up -- status
 check "status: the shell is there" "up" "$out"
-run status_notool MINI_TERM_SHELL="$tmp/no-such-shell" -- status
+run status_notool BAR_TERM_SHELL="$tmp/no-such-shell" -- status
 check "status: no shell to run with" "notool" "$out"
 
 # ---- run ------------------------------------------------------------------
@@ -52,7 +52,7 @@ check "run: output is bounded" "100" "$(printf '%s' "$out" | wc -c)"
 
 # The shell is injected by path rather than shadowed on PATH, so this asserts
 # the exact invocation without the harness losing its own shell.
-run shellargs MINI_TERM_SHELL="$here/fake-shell/shell" -- run echo hi
+run shellargs BAR_TERM_SHELL="$here/fake-shell/shell" -- run echo hi
 check "run: asks the shell for a login shell and the command" "-lc echo hi" "$(called)"
 
 run noargs -- run
@@ -61,7 +61,7 @@ check "run: nothing to run is a usage error" "2" "$status"
 # The widget stops a command by terminating the shim, and what has to die with
 # it is the whole tree the command started, not just the shim. This is the case
 # that was failing live: Ctrl+C on a sleep left the sleep running.
-marker="mini-term-test-$$"
+marker="bar-term-test-$$"
 "$shim" run "sleep 23 # $marker" >/dev/null 2>&1 &
 shim_pid=$!
 for _ in 1 2 3 4 5 6 7 8 9 10; do pgrep -f "$marker" >/dev/null && break; sleep 0.2; done

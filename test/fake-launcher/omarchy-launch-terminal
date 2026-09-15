@@ -1,5 +1,5 @@
 #!/bin/bash
-# A stand-in for omarchy-launch-terminal, for test/mini-term.sh. Logs every call to $FAKE_LOG and
+# A stand-in for omarchy-launch-terminal, for test/bar-term.sh. Logs every call to $FAKE_LOG and
 # behaves as FAKE_FAIL says.
 #
 # The shebang is an absolute path, not /usr/bin/env bash: this file sits at the front

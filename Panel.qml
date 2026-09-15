@@ -13,7 +13,7 @@ import qs.Commons
 Theme {
   id: root
 
-  property string moduleName: "io.github.swey-l1.mini-term"
+  property string moduleName: "io.github.swey-l1.bar-term"
   property var settings
 
   Config {

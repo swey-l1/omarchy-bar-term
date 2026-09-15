@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "id": "io.github.swey-l1.mini-term",
-  "name": "Mini Terminal",
+  "id": "io.github.swey-l1.bar-term",
+  "name": "Bar Terminal",
   "version": "0.1.0",
   "author": "swey-l1",
   "license": "MIT",
@@ -9,7 +9,7 @@
   "kinds": ["bar-widget"],
   "entryPoints": { "barWidget": "Panel.qml" },
   "barWidget": {
-    "displayName": "Mini Terminal",
+    "displayName": "Bar Terminal",
     "description": "Run a command from the bar and read its output without leaving what you are doing.",
     "category": "Utilities",
     "allowMultiple": false,

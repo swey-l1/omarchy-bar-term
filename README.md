@@ -1,4 +1,4 @@
-# Mini Terminal
+# Bar Terminal
 
 A command line in the Omarchy bar. Click the icon, type a command, read what it said, and
 carry on with whatever you were doing.
@@ -19,14 +19,14 @@ icon tells you how the last one went from across the screen.
 ## Install
 
 ```bash
-omarchy plugin add https://github.com/swey-l1/omarchy-mini-term --enable
+omarchy plugin add https://github.com/swey-l1/omarchy-bar-term --enable
 omarchy restart shell
 ```
 
 To remove it:
 
 ```bash
-omarchy plugin remove io.github.swey-l1.mini-term
+omarchy plugin remove io.github.swey-l1.bar-term
 ```
 
 The plugin writes only its own entry in `shell.json`, and only when you change a setting.
@@ -36,7 +36,7 @@ The plugin writes only its own entry in `shell.json`, and only when you change a
 Click the icon in the bar, or bind the toggle to a key:
 
 ```bash
-omarchy-shell shell toggle io.github.swey-l1.mini-term
+omarchy-shell shell toggle io.github.swey-l1.bar-term
 ```
 
 The prompt has the keyboard as soon as the pad opens, so you can type straight away.
@@ -95,15 +95,15 @@ Set these in `~/.config/omarchy/shell.json`, under this widget's entry in the ba
 | `maxLines` | `200` | How much scrollback to keep |
 
 ```json
-{ "id": "io.github.swey-l1.mini-term", "workdir": "/home/you/src", "timeoutSec": 60 }
+{ "id": "io.github.swey-l1.bar-term", "workdir": "/home/you/src", "timeoutSec": 60 }
 ```
 
 ## How it works
 
-The QML never runs anything itself. `mini-term`, a plain bash script, owns running the
+The QML never runs anything itself. `bar-term`, a plain bash script, owns running the
 command, bounding its output and its time, and handing it off to a terminal; the widget
 shells out to it and reads what comes back. That is also the only part with tests
-(`./test/mini-term.sh`, 15 cases against a fake shell), because it is the only part that
+(`./test/bar-term.sh`, 15 cases against a fake shell), because it is the only part that
 can be tested without a compositor.
 
 Commands run through a login shell, so they see the same `PATH` a terminal would give

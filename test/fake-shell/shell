@@ -1,9 +1,9 @@
 #!/bin/bash
-# A stand-in for the shell mini-term runs commands with, for test/mini-term.sh.
+# A stand-in for the shell bar-term runs commands with, for test/bar-term.sh.
 # Logs the exact argument list it was invoked with, one call per line, so the
 # test can assert that the shim asked for what it meant to ask for.
 #
-# Reached through $MINI_TERM_SHELL, not through PATH: the shim and this harness
+# Reached through $BAR_TERM_SHELL, not through PATH: the shim and this harness
 # both run a shell themselves, and a fake at the front of PATH would stand in
 # for those too.
 printf '%s\n' "$*" >> "${FAKE_LOG:?}"

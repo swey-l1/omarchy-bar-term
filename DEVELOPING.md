@@ -1,12 +1,12 @@
-# Mini Terminal: developing it
+# Bar Terminal: developing it
 
 Contributor notes. Not `CLAUDE.md`: the plugin marketplace refuses a tracked one inside
 an installed plugin. For Claude Code, a gitignored one-line `CLAUDE.md` containing
 `@DEVELOPING.md` imports this file (a symlink would fail `omarchy plugin validate`).
 
 An Omarchy shell plugin: a bar widget that runs a command and shows what it said. Plugin
-id `io.github.swey-l1.mini-term`, kind `bar-widget`. Everything that executes anything is
-in the `mini-term` script; the QML only asks it for things.
+id `io.github.swey-l1.bar-term`, kind `bar-widget`. Everything that executes anything is
+in the `bar-term` script; the QML only asks it for things.
 
 - `Panel.qml`: the bar widget: the icon, the command history, and the model everything
   reads through `panel`. It *is* a `Theme.qml`, which holds palette and metrics.
@@ -16,22 +16,22 @@ in the `mini-term` script; the QML only asks it for things.
 - `Service.qml`: the process layer: running a command, its output, its result, its states.
 - `PadKey.qml`, `Action.qml`, `Field.qml`, `FormButton.qml`, `HintArea.qml`,
   `PadText.qml`: the pieces. Each takes `panel`; theme values and metrics come from it.
-- `mini-term`: a plain bash script that runs the command, bounds it and hands it off.
-  `test/mini-term.sh` runs it against a fake shell and a fake terminal launcher.
+- `bar-term`: a plain bash script that runs the command, bounds it and hands it off.
+  `test/bar-term.sh` runs it against a fake shell and a fake terminal launcher.
 - `manifest.json`: the widget and its settings schema. Values live in the user's
   `~/.config/omarchy/shell.json`, never here.
 
 ## Commands
 
 ```sh
-./mini-term status                        # up | notool
-WORKDIR=/tmp ./mini-term run ls           # what the widget does, from a terminal
-./test/mini-term.sh                       # 15 cases, no compositor needed
+./bar-term status                        # up | notool
+WORKDIR=/tmp ./bar-term run ls           # what the widget does, from a terminal
+./test/bar-term.sh                       # 15 cases, no compositor needed
 /usr/lib/qt6/bin/qmllint *.qml 2>&1 | grep -E '^Error'
 omarchy plugin validate .
-omarchy plugin update io.github.swey-l1.mini-term --yes       # pull commits into the install
+omarchy plugin update io.github.swey-l1.bar-term --yes       # pull commits into the install
 omarchy restart shell                     # the only dependable way to see an edit
-omarchy-shell shell toggle io.github.swey-l1.mini-term        # open the pad without a click
+omarchy-shell shell toggle io.github.swey-l1.bar-term        # open the pad without a click
 wtype "uptime" && wtype -k Return         # and drive it without a mouse: it is all keyboard
 ```
 
@@ -42,7 +42,7 @@ sends Ctrl+C.
 ## Only the shim has tests; verify the rest by looking
 
 A QML syntax error removes the widget from the bar with one log line
-(`WARN qml: Plugin widget io.github.swey-l1.mini-term failed: …`) and no stack. qmllint
+(`WARN qml: Plugin widget io.github.swey-l1.bar-term failed: …`) and no stack. qmllint
 cannot check anything under `KeyboardPanel`, so read `Pad.qml` through by eye after
 editing it. Saving into `~/.config/omarchy/plugins/` does not reliably re-render an open
 pad; restart the shell.

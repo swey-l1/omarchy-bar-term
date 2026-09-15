@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
-# The command runner behind the Mini Terminal bar widget. The widget shells out
+# The command runner behind the Bar Terminal bar widget. The widget shells out
 # here; this script owns running the command, bounding it, and handing it off to
 # a real terminal, so it is usable from a terminal without the shell running and
-# testable alone (test/mini-term.sh).
+# testable alone (test/bar-term.sh).
 #
-#   mini-term status              "up" / "notool"
-#   mini-term run <command...>    run it, stream stdout and stderr, exit with its status
-#   mini-term open <command...>   hand it to a real terminal that outlives the pad
+#   bar-term status              "up" / "notool"
+#   bar-term run <command...>    run it, stream stdout and stderr, exit with its status
+#   bar-term open <command...>   hand it to a real terminal that outlives the pad
 #
 # The shell is not looked up through PATH under a name the test could shadow: it
-# is $MINI_TERM_SHELL, so a test can point one invocation at a fake without
+# is $BAR_TERM_SHELL, so a test can point one invocation at a fake without
 # rewriting PATH for the coreutils this script itself runs.
 set -uo pipefail
 
-SHELL_BIN="${MINI_TERM_SHELL:-/bin/bash}"
+SHELL_BIN="${BAR_TERM_SHELL:-/bin/bash}"
 # Where commands run. The widget passes its configured directory; a bare shell
 # invocation gets $HOME, which is what a terminal would have opened in.
 WORKDIR="${WORKDIR:-$HOME}"
@@ -24,7 +24,7 @@ TIMEOUT="${TIMEOUT:-20}"
 # memory on the way to being thrown away.
 MAXBYTES="${MAXBYTES:-65536}"
 
-usage() { echo "usage: mini-term {status|run <command...>|open <command...>}" >&2; exit 2; }
+usage() { echo "usage: bar-term {status|run <command...>|open <command...>}" >&2; exit 2; }
 
 case "${1:-}" in
   status)
@@ -35,7 +35,7 @@ case "${1:-}" in
 
   run)
     shift; [ $# -gt 0 ] || usage
-    cd "$WORKDIR" 2>/dev/null || { echo "mini-term: cannot enter $WORKDIR" >&2; exit 2; }
+    cd "$WORKDIR" 2>/dev/null || { echo "bar-term: cannot enter $WORKDIR" >&2; exit 2; }
 
     # Everything the command starts has to be stoppable, both when the widget
     # says stop and when it runs too long. Both are the same act -- take down the
@@ -77,7 +77,7 @@ case "${1:-}" in
   open)
     shift; [ $# -gt 0 ] || usage
     command -v omarchy-launch-terminal >/dev/null 2>&1 || {
-      echo "mini-term: omarchy-launch-terminal not found" >&2; exit 127; }
+      echo "bar-term: omarchy-launch-terminal not found" >&2; exit 127; }
     # `exec bash -l` at the end keeps the window up afterwards: the point of
     # handing off is to read or carry on with what the command left behind.
     omarchy-launch-terminal bash -lc "cd $(printf %q "$WORKDIR"); $*; exec bash -l"

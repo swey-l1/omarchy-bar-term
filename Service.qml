@@ -4,7 +4,7 @@ import qs.Commons
 
 // Everything that shells out, kept away from the pad. The half that talks to
 // the outside is worth reading without the layout around it, and it is the half
-// that can be reasoned about, and tested, on its own: see test/mini-term.sh.
+// that can be reasoned about, and tested, on its own: see test/bar-term.sh.
 //
 // Unlike a widget that watches something, this one has no poll: its state is
 // the state of the last command it was asked to run, so it changes when the
@@ -19,7 +19,7 @@ Item {
   property int timeoutSec: 20
   property int maxLines: 200
 
-  readonly property string shim: String(Qt.resolvedUrl("mini-term")).replace(/^file:\/\//, "")
+  readonly property string shim: String(Qt.resolvedUrl("bar-term")).replace(/^file:\/\//, "")
 
   // The protocol with the shim, in one place. Every comparison in the widget
   // goes through these, so a misspelling is a missing property rather than a
@@ -34,10 +34,10 @@ Item {
   // What the bar icon says for each, beside the names so a state cannot be
   // added without deciding its wording.
   readonly property var stateMessage: ({
-    idle:    "Mini Terminal",
-    running: "Mini Terminal: running",
-    failed:  "Mini Terminal: last command failed",
-    notool:  "Mini Terminal: no shell to run commands with"
+    idle:    "Bar Terminal",
+    running: "Bar Terminal: running",
+    failed:  "Bar Terminal: last command failed",
+    notool:  "Bar Terminal: no shell to run commands with"
   })
 
   readonly property var validStates: Object.keys(stateName)
@@ -107,8 +107,8 @@ Item {
       // result line is about the last command only: without this, a stopped
       // command is a prompt echo with no output and no reason given once the
       // next one has run.
-      if (exitCode === 124) svc.append("mini-term: timed out after " + svc.timeoutSec + "s")
-      else if (exitCode === 143) svc.append("mini-term: stopped")
+      if (exitCode === 124) svc.append("bar-term: timed out after " + svc.timeoutSec + "s")
+      else if (exitCode === 143) svc.append("bar-term: stopped")
       // A command the user stopped is not a failure, so the bar icon stays as it
       // was rather than going urgent over something that was asked for.
       svc.toolState = (exitCode === 0 || exitCode === 143) ? svc.stateName.idle
