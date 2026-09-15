@@ -5,20 +5,19 @@
   "version": "0.1.0",
   "author": "swey-l1",
   "license": "MIT",
-  "description": "Run a command from the bar and read its output without leaving what you are doing.",
+  "description": "A terminal session in the bar: tabs, real shells, and a key to attach one to a terminal window.",
   "kinds": ["bar-widget"],
   "entryPoints": { "barWidget": "Panel.qml" },
   "barWidget": {
     "displayName": "Bar Terminal",
-    "description": "Run a command from the bar and read its output without leaving what you are doing.",
+    "description": "A terminal session in the bar: tabs, real shells, and a key to attach one to a terminal window.",
     "category": "Utilities",
     "allowMultiple": false,
     "defaultSection": "right",
-    "defaults": { "workdir": "", "timeoutSec": 20, "maxLines": 200, "tabs": 4 },
+    "defaults": { "workdir": "", "maxLines": 200, "tabs": 4 },
     "schema": [
-      { "key": "workdir", "type": "string", "label": "Working directory", "defaultValue": "" },
-      { "key": "timeoutSec", "type": "integer", "label": "Stop a command after (seconds)", "min": 1, "max": 300, "step": 5, "defaultValue": 20 },
-      { "key": "maxLines", "type": "integer", "label": "Scrollback (lines)", "min": 20, "max": 2000, "step": 20, "defaultValue": 200 },
+      { "key": "workdir", "type": "string", "label": "Where new sessions start", "defaultValue": "" },
+      { "key": "maxLines", "type": "integer", "label": "Scrollback read (lines)", "min": 20, "max": 2000, "step": 20, "defaultValue": 200 },
       { "key": "tabs", "type": "integer", "label": "Tabs", "min": 1, "max": 6, "step": 1, "defaultValue": 4 }
     ]
   }

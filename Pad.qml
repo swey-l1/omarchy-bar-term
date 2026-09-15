@@ -84,8 +84,9 @@ KeyboardPanel {
           // Long lines wrap rather than being cut: a path or a compiler error
           // says nothing useful once its right-hand half is an ellipsis.
           wrapMode: Text.WrapAnywhere
-          // The echoed command line is what separates one run from the next.
-          opacity: text.indexOf("$ ") === 0 ? 0.95 : 0.7
+          // The session's own prompt is in this text, so nothing here has to
+          // mark where one command ends and the next begins.
+          opacity: 0.8
           font.family: panel.monoFamily
           font.pixelSize: panel.monoSize
         }
@@ -94,7 +95,7 @@ KeyboardPanel {
           panel: pad.panel
           anchors.centerIn: parent
           visible: scrollback.count === 0
-          text: panel.usable ? "type a command below" : "no shell to run commands with"
+          text: panel.usable ? "type a command below" : "tmux is not installed"
           opacity: 0.35
           font.pixelSize: 9
         }

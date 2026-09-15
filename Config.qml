@@ -26,9 +26,10 @@ Item {
   //
   // An empty workdir is left empty rather than filled in with a guess: the shim
   // answers that with $HOME, which is the one place QML cannot name and the
-  // shell always can.
+  // shell always can. It is where a *new* session starts; after that the
+  // session's own shell owns where it is, which is the point of a session.
   readonly property string workdir: setting("workdir", "")
-  readonly property int timeoutSec: setting("timeoutSec", 20)
+  // How far back into the session's scrollback the pad reads.
   readonly property int maxLines: setting("maxLines", 200)
   // Clamped, because shell.json is hand-edited and nothing enforces the
   // manifest's range: zero tabs would leave the pad with nothing to draw.

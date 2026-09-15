@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Runs the shim and checks what it prints, what status it exits with, and what
-# it asked the shell and the terminal launcher to do. The only half of the
-# plugin that can be tested without a compositor, so it is.
+# Runs the shim against a fake tmux and a fake terminal launcher, and checks
+# what it asked them to do. The only half of the plugin that can be tested
+# without a compositor, so it is -- and the half worth testing, since every
+# session the widget has runs through these eight verbs.
 #
 #   ./test/bar-term.sh          # exit 0 when every case passes
 set -u
@@ -14,72 +15,80 @@ run() {  # run <name> [VAR=value ...] -- <shim args...>
   name=$1; shift; envs=()
   while [ "$1" != "--" ]; do envs+=("$1"); shift; done; shift
   FAKE_LOG="$tmp/$name.log"; rm -f "$FAKE_LOG"
-  out=$(env PATH="$here/fake-launcher:$PATH" FAKE_LOG="$FAKE_LOG" "${envs[@]}" "$shim" "$@" 2>&1)
+  out=$(env PATH="$here/fake-launcher:$PATH" FAKE_LOG="$FAKE_LOG" \
+            BAR_TERM_TMUX="$here/fake-tmux/tmux" XDG_RUNTIME_DIR="$tmp" \
+            "${envs[@]}" "$shim" "$@" 2>&1)
   status=$?
 }
-called() { cat "$FAKE_LOG" 2>/dev/null || true; }   # what reached the fake, one call per line
+called() { cat "$FAKE_LOG" 2>/dev/null || true; }   # what reached the fakes
 check() { if [ "$2" = "$3" ]; then pass=$((pass+1)); else fail=$((fail+1)); printf 'FAIL %s\n  want: %s\n  got:  %s\n' "$1" "$2" "$3"; fi; }
 contains() { case "$3" in *"$2"*) pass=$((pass+1));; *) fail=$((fail+1)); printf 'FAIL %s\n  want substring: %s\n  got: %s\n' "$1" "$2" "$3";; esac; }
+absent() { case "$3" in *"$2"*) fail=$((fail+1)); printf 'FAIL %s\n  should not contain: %s\n  got: %s\n' "$1" "$2" "$3";; *) pass=$((pass+1));; esac; }
 
-# ---- status ---------------------------------------------------------------
+# ---- is there anything to run sessions with -------------------------------
 run status_up -- status
-check "status: the shell is there" "up" "$out"
-run status_notool BAR_TERM_SHELL="$tmp/no-such-shell" -- status
-check "status: no shell to run with" "notool" "$out"
+check "status: tmux is there" "up" "$out"
+run status_notool BAR_TERM_TMUX="$tmp/no-such-tmux" -- status
+check "status: no tmux to make sessions with" "notool" "$out"
 
-# ---- run ------------------------------------------------------------------
-run out -- run echo hello
-check "run: prints what the command printed" "hello" "$out"
+# ---- making a session exist ------------------------------------------------
+run ensure_new WORKDIR=/srv -- ensure 2
+check "ensure: names the session after the tab" "bar-term-2" "$out"
+contains "ensure: starts it in the configured directory" "-c /srv" "$(called)"
+contains "ensure: gives it our rc file, not the user's shell as-is" "session-rc.bash" "$(called)"
 
-run rc -- run 'exit 3'
-check "run: exits with the command's status" "3" "$status"
+run ensure_existing FAKE_SESSIONS="bar-term-2 bash" -- ensure 2
+absent "ensure: does not build a session that already exists" "new-session" "$(called)"
 
-run stderr -- run 'echo out; echo err >&2'
-check "run: stderr lands in the same stream" "out
-err" "$out"
+# ---- sending a command -----------------------------------------------------
+run send FAKE_SESSIONS="bar-term-1 bash" -- send 1 'git log --oneline | head -3'
+contains "send: types the command literally" "send-keys -t bar-term-1 -l -- git log --oneline | head -3" "$(called)"
+contains "send: presses Enter separately" "send-keys -t bar-term-1 Enter" "$(called)"
 
-run cwd WORKDIR="$tmp" -- run pwd
-check "run: runs in the configured directory" "$tmp" "$out"
+run send_makes FAKE_SESSIONS="" -- send 3 uptime
+contains "send: makes the session first if it is gone" "new-session" "$(called)"
 
-run badcwd WORKDIR="$tmp/missing" -- run pwd
-check "run: a directory that is gone is an error, not a run elsewhere" "2" "$status"
+# ---- reading the screen ----------------------------------------------------
+run capture FAKE_SESSIONS="bar-term-1 bash" FAKE_CAPTURE="one
+two
 
-run slow TIMEOUT=1 -- run 'sleep 5'
-check "run: a command that hangs is cut off" "124" "$status"
 
-run big MAXBYTES=100 -- run 'yes abcdefgh'
-check "run: output is bounded" "100" "$(printf '%s' "$out" | wc -c)"
+" -- capture 1 50
+check "capture: drops the blank rows that are just pane height" "one
+two" "$out"
+contains "capture: reaches back through the scrollback" "-S -50" "$(called)"
 
-# The shell is injected by path rather than shadowed on PATH, so this asserts
-# the exact invocation without the harness losing its own shell.
-run shellargs BAR_TERM_SHELL="$here/fake-shell/shell" -- run echo hi
-check "run: asks the shell for a login shell and the command" "-lc echo hi" "$(called)"
+# ---- what every tab is doing, in one call ----------------------------------
+mkdir -p "$tmp/bar-term" && printf '3' > "$tmp/bar-term/1.rc"
+run states FAKE_SESSIONS="bar-term-1 bash
+bar-term-2 sleep" -- states 3
+check "states: idle with its last exit, running, and gone" "1 idle 3
+2 running -
+3 gone -" "$out"
+check "states: one tmux call for every tab, not one each" "1" "$(grep -c list-sessions "$FAKE_LOG")"
 
-run noargs -- run
-check "run: nothing to run is a usage error" "2" "$status"
+# ---- the rest of the verbs -------------------------------------------------
+run interrupt FAKE_SESSIONS="bar-term-1 bash" -- interrupt 1
+contains "interrupt: sends Ctrl+C into the session" "send-keys -t bar-term-1 C-c" "$(called)"
 
-# The widget stops a command by terminating the shim, and what has to die with
-# it is the whole tree the command started, not just the shim. This is the case
-# that was failing live: Ctrl+C on a sleep left the sleep running.
-marker="bar-term-test-$$"
-"$shim" run "sleep 23 # $marker" >/dev/null 2>&1 &
-shim_pid=$!
-for _ in 1 2 3 4 5 6 7 8 9 10; do pgrep -f "$marker" >/dev/null && break; sleep 0.2; done
-kill -TERM "$shim_pid" 2>/dev/null
-for _ in 1 2 3 4 5 6 7 8 9 10; do pgrep -f "$marker" >/dev/null || break; sleep 0.2; done
-left=$(pgrep -f "$marker" | wc -l)
-wait "$shim_pid" 2>/dev/null
-check "run: stopping the shim stops what it started" "0" "$left"
+run reset FAKE_SESSIONS="bar-term-1 bash" -- reset 1
+contains "reset: empties the scrollback" "clear-history -t bar-term-1" "$(called)"
+contains "reset: and redraws an empty screen" "-l -- clear" "$(called)"
 
-# ---- open -----------------------------------------------------------------
-run opennoargs WORKDIR="$tmp" -- open
-contains "open: no command still opens a terminal there" "cd $tmp" "$(called)"
+printf '9' > "$tmp/bar-term/1.rc"
+run restart FAKE_SESSIONS="bar-term-1 bash" -- restart 1
+contains "restart: kills the old session" "kill-session -t =bar-term-1" "$(called)"
+contains "restart: and builds a new one" "new-session" "$(called)"
+check "restart: forgets the old session's last exit" "" "$(cat "$tmp/bar-term/1.rc" 2>/dev/null)"
 
-run open WORKDIR="$tmp" -- open htop
-contains "open: hands the command to a terminal" "cd $tmp; htop" "$(called)"
-contains "open: leaves a shell behind afterwards" "exec bash -l" "$(called)"
+run attach FAKE_SESSIONS="bar-term-1 bash" -- attach 1
+contains "attach: opens a terminal on the same session, not a new shell" "attach -t =bar-term-1" "$(called)"
 
-# ---- usage ----------------------------------------------------------------
+# ---- refusing nonsense -----------------------------------------------------
+run nonum -- send
+check "a missing session number is an error" "2" "$status"
+run badnum -- send x echo
+check "a session number that is not one is an error" "2" "$status"
 run bogus -- bogus
 check "unknown verb exits 2" "2" "$status"
 

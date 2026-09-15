@@ -12,7 +12,7 @@ Rectangle {
   readonly property var session: panel.sessions.length > index ? panel.sessions[index] : null
   readonly property bool active: panel.activeTab === index
   readonly property bool running: session ? session.running : false
-  readonly property bool failed: session ? session.toolState === "failed" : false
+  readonly property bool failed: session ? session.failed : false
   // The command word, or the number on its own for a tab nothing has run in.
   readonly property string caption: session && session.tabLabel !== ""
                                   ? (index + 1) + " " + session.tabLabel

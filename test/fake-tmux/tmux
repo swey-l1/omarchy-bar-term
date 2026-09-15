@@ -1,0 +1,27 @@
+#!/bin/bash
+# A stand-in for tmux, for test/bar-term.sh. Logs every call to $FAKE_LOG, one
+# per line, and answers the few questions the shim asks:
+#
+#   FAKE_SESSIONS   what list-sessions prints (and what has-session matches)
+#   FAKE_CAPTURE    what capture-pane prints
+#
+# Reached through $BAR_TERM_TMUX rather than PATH: the shim runs coreutils of
+# its own, and a fake at the front of PATH would stand in for those too.
+printf '%s\n' "$*" >> "${FAKE_LOG:?}"
+
+case "$1" in
+  kill-session)
+    # Remembered, so a session really is gone afterwards: without this a test
+    # for "restart" would see the killed session still answering has-session
+    # and never reach the part that builds a new one.
+    printf '%s\n' "${3#=}" >> "$FAKE_LOG.killed"
+    ;;
+  has-session)
+    s=${3#=}
+    grep -qx "$s" "$FAKE_LOG.killed" 2>/dev/null && exit 1
+    printf '%s\n' "${FAKE_SESSIONS:-}" | grep -q "^$s " && exit 0 || exit 1
+    ;;
+  list-sessions) printf '%s\n' "${FAKE_SESSIONS:-}" ;;
+  capture-pane)  printf '%s' "${FAKE_CAPTURE:-}" ;;
+esac
+exit 0
