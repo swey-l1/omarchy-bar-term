@@ -95,7 +95,16 @@ Item {
   // a ListModel would mean a row object per line for text that is never edited.
   property var output: []
 
-  function clear() { output = []; lastExit = -1; lastMs = 0; lastCmd = "" }
+  function clear() {
+    output = []; lastExit = -1; lastMs = 0; lastCmd = ""
+    // And the verdict with it. Leaving the icon urgent after a clear points the
+    // user at output that is no longer there, and the only way back to normal
+    // was to run something else that happened to succeed.
+    //
+    // Only from failed: a command still running keeps `running`, and `notool`
+    // is about the machine rather than about anything that was run.
+    if (toolState === stateName.failed) toolState = stateName.idle
+  }
 
   function append(line) {
     var next = output.slice()
