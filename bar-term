@@ -55,6 +55,18 @@ ensure() {
   BAR_TERM_RC_FILE=$(rc_file "$n") \
     "$TMUX_BIN" new-session -d -s "$s" -c "$WORKDIR" -x "$COLS" -y "$ROWS" \
       "BAR_TERM_RC_FILE=$(printf %q "$(rc_file "$n")") exec bash --rcfile $(printf %q "$here/session-rc.bash") -i"
+  # Wait for the shell to have drawn its prompt before anyone types into it.
+  # Keys sent to a pty whose shell has not read them yet are echoed raw and then
+  # read back as input, so the first command of a session appeared twice: once
+  # as bare text at the top of the screen, once properly at a prompt.
+  #
+  # The signal is the prompt itself. #{pane_current_command} is no use here: it
+  # says "bash" from the moment the pane exists, which is before bash has run
+  # anyone's rc files or printed anything.
+  for _ in $(seq 1 40); do
+    [ -n "$("$TMUX_BIN" capture-pane -p -t "$s" 2>/dev/null | tr -d '[:space:]')" ] && break
+    sleep 0.05
+  done
   echo "$s"
 }
 
