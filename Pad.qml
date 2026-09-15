@@ -73,9 +73,15 @@ KeyboardPanel {
         clip: true
         model: panel.output
         boundsBehavior: Flickable.StopAtBounds
-        // Output arrives a line at a time and the interesting end is the new
-        // one, so the view follows it down unless it is being read further up.
-        onCountChanged: if (atYEnd || count <= 1) Qt.callLater(positionViewAtEnd)
+        // The whole screen is replaced on every capture, not appended to, so
+        // following the new output means reacting to the model itself changing;
+        // a count that happens to stay the same is still new text.
+        //
+        // Unless it is being read further up: scrolling back and being yanked
+        // to the bottom twice a second would make the scrollback useless.
+        property bool followTail: true
+        onMovementEnded: followTail = atYEnd
+        onModelChanged: if (followTail) Qt.callLater(positionViewAtEnd)
 
         delegate: PadText {
           panel: pad.panel
