@@ -95,6 +95,11 @@ Theme {
     close()
   }
 
+  // The pad owns the prompt, so the key table reaches it through here rather
+  // than every binding knowing about the pad's internals.
+  function submitPrompt()   { pad.submit() }
+  function recallInto(step) { pad.recall(step) }
+
   Bindings { id: bindings; panel: root }
   readonly property var keyHelp: bindings.keyHelp
   function hintFor(id)   { return bindings.hintFor(id) }
