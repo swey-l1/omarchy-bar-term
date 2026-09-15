@@ -75,7 +75,10 @@ case "${1:-}" in
     ;;
 
   open)
-    shift; [ $# -gt 0 ] || usage
+    shift
+    # No command is a legitimate ask: it means "give me a terminal here", which
+    # is what the pad does when Ctrl+T is pressed with an empty prompt.
+    [ $# -gt 0 ] || set -- true
     command -v omarchy-launch-terminal >/dev/null 2>&1 || {
       echo "bar-term: omarchy-launch-terminal not found" >&2; exit 127; }
     # `exec bash -l` at the end keeps the window up afterwards: the point of

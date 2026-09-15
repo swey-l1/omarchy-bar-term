@@ -30,6 +30,7 @@ KeyboardPanel {
   property bool showKeys: false
 
   function promptText() { return prompt.text }
+  function setPrompt(s) { prompt.text = String(s || "") }
   function submit() {
     if (panel.runCommand(prompt.text)) prompt.text = ""
   }
@@ -148,6 +149,24 @@ KeyboardPanel {
       Key { glyph: "󰃢"; action: "clear" }
       Key { glyph: "󰆍"; action: "terminal" }
       Key { glyph: "󰅖"; action: "close" }
+    }
+
+    // ---- the tabs ---------------------------------------------------------
+    // Along the foot rather than above the scrollback: what is being read is the
+    // output, and a strip at the top would push it down the pad every time.
+    Row {
+      spacing: panel.tightGap
+      visible: panel.sessions.length > 1
+
+      Repeater {
+        model: panel.sessions.length
+        TabButton {
+          panel: pad.panel
+          index: modelData
+          width: Math.floor((panel.padWidth - panel.tightGap * (panel.sessions.length - 1))
+                            / panel.sessions.length)
+        }
+      }
     }
 
     // Hover-only: there is nothing to click, it is just where the bindings

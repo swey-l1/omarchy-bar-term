@@ -45,6 +45,45 @@ Item {
   // Not `state`: Item already has one, driving QML's own state machine.
   property string toolState: stateName.idle
 
+  // What this session remembers: its own command history, and whatever was
+  // half-typed in the prompt when the tab was last left. Both are per session
+  // because a tab that forgets what you typed the moment you look at another one
+  // is not a tab, it is a shared prompt with extra steps.
+  property var history: []
+  property int historyAt: -1   // -1 = not walking the history, typing something new
+  property string draft: ""
+
+  function remember(cmd) {
+    if (history.length === 0 || history[history.length - 1] !== cmd) {
+      var h = history.slice(); h.push(cmd)
+      if (h.length > 100) h = h.slice(h.length - 100)
+      history = h
+    }
+    historyAt = -1
+  }
+
+  // Walks the history and hands back what the prompt should now hold. Returns
+  // null when there is nothing in that direction, so the prompt leaves what is
+  // there rather than blanking it.
+  function recall(step) {
+    if (history.length === 0) return null
+    var i = historyAt < 0 ? history.length : historyAt
+    i += step
+    if (i < 0) i = 0
+    if (i >= history.length) { historyAt = -1; return "" }
+    historyAt = i
+    return history[i]
+  }
+
+  // A short name for the tab strip: the command word, which is what tells one
+  // session from another at a glance ("git", "journalctl", "make").
+  readonly property string tabLabel: {
+    var c = lastCmd.trim()
+    if (c === "") return ""
+    var w = c.split(/\s+/)[0]
+    return w.length > 8 ? w.substring(0, 8) : w
+  }
+
   // The last command's result, for the line above the prompt. -1 means nothing
   // has finished yet, which is a different thing from having exited 0.
   property int lastExit: -1
@@ -80,6 +119,7 @@ Item {
   function runCmd(cmd) {
     var c = String(cmd || "").trim()
     if (c === "" || runner.running) return false
+    remember(c)
     lastCmd = c
     lastExit = -1
     append("$ " + c)

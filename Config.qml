@@ -30,6 +30,9 @@ Item {
   readonly property string workdir: setting("workdir", "")
   readonly property int timeoutSec: setting("timeoutSec", 20)
   readonly property int maxLines: setting("maxLines", 200)
+  // Clamped, because shell.json is hand-edited and nothing enforces the
+  // manifest's range: zero tabs would leave the pad with nothing to draw.
+  readonly property int tabs: Math.max(1, Math.min(6, setting("tabs", 4)))
 
   // updateEntryInline REPLACES the entry with { id } plus whatever it is handed,
   // so any key omitted here is silently dropped from shell.json. Always send
