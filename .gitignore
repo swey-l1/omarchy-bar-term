@@ -1,0 +1,5 @@
+*.bak
+*.bak.*
+docs/*.visual-check.*
+# agent instructions stay local; the marketplace refuses a tracked CLAUDE.md
+CLAUDE.md

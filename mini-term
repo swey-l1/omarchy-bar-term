@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# omarchy-launch-terminal shim for the Mini Terminal bar widget. The widget shells out here; this
+# script owns every call to omarchy-launch-terminal, so it is usable from a terminal without
+# the shell running and testable alone (test/mini-term.sh).
+#
+#   mini-term status         "up" / "down" / "notool"
+#   mini-term run [args...]  run omarchy-launch-terminal against $TARGET with the given args
+#
+# $TARGET is what the widget configured; add a sensible fallback for hand use.
+set -uo pipefail
+
+TARGET="${TARGET:-}"
+
+if ! command -v omarchy-launch-terminal >/dev/null 2>&1; then
+  # Reported rather than fatal so the widget can show a distinct state.
+  [ "${1-}" = "status" ] && { echo notool; exit 0; }
+  echo "omarchy-launch-terminal not found" >&2
+  exit 127
+fi
+
+# The word the widget reads. Takes the check that means "up".
+report() {
+  if "$@"; then echo up; else echo down; fi
+}
+
+# Replace with what "reachable" means for omarchy-launch-terminal and $TARGET; until then a
+# fresh scaffold reports up so the icon starts in the normal colour.
+reachable() { true; }
+
+case "${1:-}" in
+  status) report reachable ;;
+  run)    shift; omarchy-launch-terminal "$@" ;;
+  *)      echo "usage: mini-term {status|run [args...]}" >&2; exit 2 ;;
+esac

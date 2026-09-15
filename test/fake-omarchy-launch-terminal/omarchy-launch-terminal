@@ -1,0 +1,10 @@
+#!/bin/bash
+# A stand-in for omarchy-launch-terminal, for test/mini-term.sh. Logs every call to $FAKE_LOG and
+# behaves as FAKE_FAIL says.
+#
+# The shebang is an absolute path, not /usr/bin/env bash: this file sits at the front
+# of PATH while the test runs, so env would look its own interpreter up through the
+# fakes and could find this script again.
+printf '%s\n' "$*" >> "${FAKE_LOG:?}"
+[ -n "${FAKE_FAIL:-}" ] && exit 1
+exit 0

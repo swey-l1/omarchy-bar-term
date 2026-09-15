@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.swey-l1.mini-term",
+  "name": "Mini Terminal",
+  "version": "0.1.0",
+  "author": "swey-l1",
+  "license": "MIT",
+  "description": "Run a command from the bar and read its output without leaving what you are doing.",
+  "kinds": ["bar-widget"],
+  "entryPoints": { "barWidget": "Panel.qml" },
+  "barWidget": {
+    "displayName": "Mini Terminal",
+    "description": "Run a command from the bar and read its output without leaving what you are doing.",
+    "category": "Other",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": { "target": "", "pollSec": 60 },
+    "schema": [
+      { "key": "target", "type": "string", "label": "Target", "defaultValue": "" },
+      { "key": "pollSec", "type": "integer", "label": "Poll (seconds)", "min": 10, "max": 600, "step": 10, "defaultValue": 60 }
+    ]
+  }
+}
