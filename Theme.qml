@@ -65,7 +65,10 @@ Item {
   // The scrollback. Bounded so a long-running command cannot grow the pad off
   // the screen; it scrolls inside this instead.
   readonly property int outputHeight:  Style.space(230)
-  readonly property int helpListHeight: Style.space(120)
+  // A whole number of rows, so when there are more bindings than fit, the list
+  // scrolls from a clean edge instead of cutting one in half and looking broken.
+  readonly property int helpListRows:   12
+  readonly property int helpListHeight: helpRowHeight * helpListRows
 
   // Output is read as columns as often as prose (ls, ps, a stack trace), so it
   // is the one place on the pad with a fixed-pitch face.
