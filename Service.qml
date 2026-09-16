@@ -70,18 +70,76 @@ Item {
   // somebody else's session drives that one and nothing has to translate.
   function verb(name, args) { fire(name + " " + Util.shellQuote(args) ) }
 
-  function send(cmd) {
-    var c = String(cmd || "").trim()
-    if (c === "" || !active) return false
-    active.remember(c)
-    active.lastCmd = c
-    // Assume it started rather than waiting up to a tick to be told: the pad
-    // should look busy the instant Enter is pressed.
-    active.sessionState = active.stateName.running
-    active.lastExit = -1
-    fire("send " + Util.shellQuote(active.name) + " " + Util.shellQuote(c))
-    captureSoon.restart()
-    return true
+  // ---- typing straight into the session ------------------------------------
+  //
+  // Keystrokes are queued and sent by one Process at a time, never through
+  // fire-and-forget: two detached calls can land in either order, and a shell
+  // that receives "l" then "s" when you typed "ls" is worse than a slow one.
+  // Consecutive characters are coalesced into a single `type`, so a fast typist
+  // costs fewer invocations rather than more.
+  property var pending: []
+
+  function enqueue(item) {
+    var q = pending.slice(); q.push(item); pending = q
+    hot.restart()          // read the screen back quickly while typing
+    drain()
+  }
+
+  function typeText(s) { if (active && s !== "") enqueue({ kind: "text", value: s }) }
+  function sendKey(name) { if (active) enqueue({ kind: "key", value: name }) }
+
+  function drain() {
+    if (sender.running || pending.length === 0 || !active) return
+    var q = pending.slice()
+    var first = q.shift()
+    var args
+    if (first.kind === "text") {
+      var text = first.value
+      while (q.length > 0 && q[0].kind === "text") text += q.shift().value
+      args = "type " + Util.shellQuote(active.name) + " " + Util.shellQuote(text)
+    } else {
+      var keys = [first.value]
+      while (q.length > 0 && q[0].kind === "key") keys.push(q.shift().value)
+      args = "key " + Util.shellQuote(active.name) + " " + keys.join(" ")
+    }
+    pending = q
+    sender.command = ["bash", "-c", shimCmd(args)]
+    sender.running = true
+  }
+
+  Process {
+    id: sender
+    onExited: function(code, status) { svc.drain(); svc.pollCapture() }
+  }
+
+  // What the pad does with a key it does not want for itself. Returns true when
+  // the session took it, which is nearly always: the point of this widget is
+  // that the shell gets the keyboard.
+  function forwardKey(ev) {
+    if (!active) return false
+    var named = ({})
+    named[Qt.Key_Return] = "Enter";     named[Qt.Key_Enter] = "Enter"
+    named[Qt.Key_Tab] = "Tab";          named[Qt.Key_Backtab] = "BTab"
+    named[Qt.Key_Backspace] = "BSpace"; named[Qt.Key_Delete] = "DC"
+    named[Qt.Key_Up] = "Up";            named[Qt.Key_Down] = "Down"
+    named[Qt.Key_Left] = "Left";        named[Qt.Key_Right] = "Right"
+    named[Qt.Key_Home] = "Home";        named[Qt.Key_End] = "End"
+    named[Qt.Key_PageUp] = "PPage";     named[Qt.Key_PageDown] = "NPage"
+
+    // Ctrl and a letter is a control key by name, not by the control character
+    // Qt puts in ev.text: tmux wants "C-c", and \u0003 would arrive as nothing.
+    if ((ev.modifiers & Qt.ControlModifier) && ev.key >= Qt.Key_A && ev.key <= Qt.Key_Z) {
+      sendKey("C-" + String.fromCharCode(ev.key).toLowerCase())
+      return true
+    }
+    if (named[ev.key] !== undefined) { sendKey(named[ev.key]); return true }
+    // Anything printable is itself. Control characters are not: they arrive here
+    // only when something above has already declined them.
+    if (ev.text && ev.text.length > 0 && ev.text.charCodeAt(0) >= 0x20) {
+      typeText(ev.text)
+      return true
+    }
+    return false
   }
 
   function interrupt() { if (active) { verb("interrupt", active.name); captureSoon.restart() } }
@@ -180,6 +238,24 @@ Item {
     id: captureSoon
     interval: 120; repeat: false
     onTriggered: { svc.pollCapture(); svc.pollStates() }
+  }
+
+  // While someone is typing, the screen is read back fast enough that the echo
+  // keeps up with the keyboard: a capture costs about ten milliseconds, so this
+  // is affordable for the second or so a burst of typing lasts, and stops on its
+  // own afterwards.
+  property bool typing: false
+  Timer {
+    id: hot
+    interval: 900; repeat: false
+    onTriggered: svc.typing = false
+    onRunningChanged: if (running) svc.typing = true
+  }
+  Timer {
+    interval: 60
+    running: svc.typing && svc.open
+    repeat: true
+    onTriggered: svc.pollCapture()
   }
 
   // Switching tabs shows the new one's screen straight away; the old capture

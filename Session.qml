@@ -36,33 +36,6 @@ Item {
   readonly property bool running: sessionState === stateName.running
   readonly property bool failed:  sessionState === stateName.idle && lastExit > 0
 
-  // Its own command history and its own half-typed line, because a tab that
-  // forgets what you typed the moment you look at another one is not a tab.
-  property var history: []
-  property int historyAt: -1
-  property string draft: ""
-
-  function remember(cmd) {
-    if (history.length === 0 || history[history.length - 1] !== cmd) {
-      var h = history.slice(); h.push(cmd)
-      if (h.length > 100) h = h.slice(h.length - 100)
-      history = h
-    }
-    historyAt = -1
-  }
-
-  // Null when there is nothing further in that direction, so the prompt keeps
-  // what is in it rather than blanking.
-  function recall(step) {
-    if (history.length === 0) return null
-    var i = historyAt < 0 ? history.length : historyAt
-    i += step
-    if (i < 0) i = 0
-    if (i >= history.length) { historyAt = -1; return "" }
-    historyAt = i
-    return history[i]
-  }
-
   // Where the session is, which is what tells one from another at a glance and
   // is the thing a session is actually *for*: tab 2 is the one in /etc.
   //
@@ -87,5 +60,4 @@ Item {
     // tells it apart ("…bar-term" beats "omarchy-b").
     return base.length > 10 ? "…" + base.substring(base.length - 9) : base
   }
-  property string lastCmd: ""
 }

@@ -21,16 +21,25 @@ KeyboardPanel {
   contentWidth: pane.implicitWidth + padding * 2
   contentHeight: pane.implicitHeight + padding * 2
 
-  // The prompt is where the keyboard belongs here, so both of these end at the
-  // same place; focusControls exists because the Panel's own template calls it.
-  function focusPrompt()   { prompt.focusMe() }
-  function focusControls() { prompt.focusMe() }
+  // There is no field to focus: the keys go to the session, so the pad only has
+  // to hold the keyboard itself.
+  function focusControls() { keyCatcher.forceActiveFocus() }
+  function focusPrompt()   { keyCatcher.forceActiveFocus() }
 
   // Hover-only list of the bindings that have no button of their own.
   property bool showKeys: false
 
-  function promptText() { return prompt.text }
-  function setPrompt(s) { prompt.text = String(s || "") }
+  // capture-pane returns text, not a cursor, so the pad draws its own: a block
+  // on the end of the last line, which is where the shell's is when it is
+  // waiting for you. Hidden while something is running, because then the cursor
+  // belongs to that program and could be anywhere.
+  property bool caretOn: true
+  readonly property bool caretShown: panel.opened && !panel.busy && panel.usable
+  Timer {
+    interval: 550; repeat: true; running: pad.caretShown
+    onTriggered: pad.caretOn = !pad.caretOn
+  }
+
   function togglePicker() { if (picker.open) picker.hide(); else picker.show() }
 
   // The picker sees keys first while it is open, so Up, Down and Enter mean the
@@ -40,27 +49,16 @@ KeyboardPanel {
     if (picker.handleKey(ev)) return true
     return panel.handleKey(ev)
   }
-  function submit() {
-    if (panel.runCommand(prompt.text)) prompt.text = ""
-  }
-  // Null back from the Panel means there is nothing further in that direction,
-  // so what is typed stays where it is.
-  function recall(step) {
-    var t = panel.recall(step)
-    if (t !== null) prompt.text = t
-  }
-
   component Key: PadKey { panel: pad.panel }
 
-  // Zero-sized, and exists only to own the keyboard when the prompt does not. A
-  // layer-shell panel still has to route keys to *something*, and right after
-  // the pad opens the keys can arrive here before focus has settled on the
-  // prompt, so they are forwarded rather than dropped.
+  // Zero-sized, and the only thing here that holds the keyboard. Every key it
+  // receives is offered to the picker, then to the pad's own table, and anything
+  // left is typed into the session.
   Item {
     id: keyCatcher
     width: 0
     height: 0
-    Keys.forwardTo: [prompt.input]
+    focus: true
     Keys.onPressed: function(ev) { if (pad.handleKey(ev)) ev.accepted = true }
   }
 
@@ -102,7 +100,11 @@ KeyboardPanel {
         delegate: PadText {
           panel: pad.panel
           width: scrollback.width
-          text: modelData
+          // The caret rides on the end of the last line rather than being its
+          // own item: the lines wrap, and a separate caret would sit at the
+          // right-hand edge of the box instead of after the last character.
+          text: modelData + (index === scrollback.count - 1 && pad.caretShown
+                             ? (pad.caretOn ? "█" : " ") : "")
           // Long lines wrap rather than being cut: a path or a compiler error
           // says nothing useful once its right-hand half is an ellipsis.
           wrapMode: Text.WrapAnywhere
@@ -117,7 +119,7 @@ KeyboardPanel {
           panel: pad.panel
           anchors.centerIn: parent
           visible: scrollback.count === 0
-          text: panel.usable ? "type a command below" : "tmux is not installed"
+          text: panel.usable ? "type; it goes straight to the shell" : "tmux is not installed"
           opacity: 0.35
           font.pixelSize: 9
         }
@@ -154,19 +156,6 @@ KeyboardPanel {
         opacity: panel.session && !panel.session.owned ? 0.6 : 0.4
         font.pixelSize: 9
       }
-    }
-
-    // ---- the prompt -------------------------------------------------------
-    Field {
-      id: prompt
-      panel: pad.panel
-      width: panel.padWidth
-      placeholder: "command"
-      fontSize: panel.monoSize + 1
-      // One hook for both routes into the field: whether the key arrived here
-      // directly or was forwarded by the catcher, it is offered to the same
-      // place, and anything unclaimed is typing.
-      onKey: function(ev) { return pad.handleKey(ev) }
     }
 
     Row {

@@ -9,6 +9,8 @@
 #   bar-term list                   every session on the server: "<name>\t<cwd>"
 #   bar-term ensure <name>          make that session exist, print its name
 #   bar-term send <name> <cmd...>   type a command into it and press Enter
+#   bar-term type <name> <text>     type text into it, no Enter
+#   bar-term key <name> <key>...    press named keys in it: Enter, Tab, C-c, Up
 #   bar-term capture <name> [lines] print what its screen says
 #   bar-term states <name>...       a line per name, in order: "<i> idle|running|gone <exit> <cwd>"
 #   bar-term interrupt <name>       Ctrl+C into it
@@ -100,6 +102,24 @@ case "${1:-}" in
     # separately so a command containing the word "Enter" is not misread.
     "$TMUX_BIN" send-keys -t "$s" -l -- "$*"
     "$TMUX_BIN" send-keys -t "$s" Enter
+    ;;
+
+  type)
+    need_name "${2:-}"; have_tmux || exit 127
+    s=$2; shift 2; [ $# -gt 0 ] || usage
+    ensure "$s" >/dev/null
+    # -l is literal: no key name in the text is interpreted, so a command
+    # containing the word "Enter" types the word.
+    "$TMUX_BIN" send-keys -t "$s" -l -- "$*"
+    ;;
+
+  key)
+    need_name "${2:-}"; have_tmux || exit 127
+    s=$2; shift 2; [ $# -gt 0 ] || usage
+    ensure "$s" >/dev/null
+    # Named keys, the other half of `type`: Enter, Tab, BSpace, Up, C-c, C-r.
+    # Whatever tmux understands, which is what the shell will see.
+    "$TMUX_BIN" send-keys -t "$s" -- "$@"
     ;;
 
   capture)

@@ -54,6 +54,22 @@ contains "send: presses Enter separately" "send-keys -t bar-term-1 Enter" "$(cal
 run send_makes FAKE_SESSIONS="" -- send bar-term-3 uptime
 contains "send: makes the session first if it is gone" "new-session" "$(called)"
 
+# ---- typing into it, a key at a time ---------------------------------------
+# The pad types rather than sending whole lines, so the shell's own completion
+# and line editing do the work instead of being imitated.
+run type FAKE_SESSIONS=$'bar-term-1\tbash\t/tmp' -- type bar-term-1 'ls ~/sr'
+contains "type: sends the text literally, with no Enter" "send-keys -t bar-term-1 -l -- ls ~/sr" "$(called)"
+absent "type: does not press Enter" "send-keys -t bar-term-1 Enter" "$(called)"
+
+run key FAKE_SESSIONS=$'bar-term-1\tbash\t/tmp' -- key bar-term-1 Tab
+contains "key: presses a named key" "send-keys -t bar-term-1 -- Tab" "$(called)"
+
+run keys FAKE_SESSIONS=$'bar-term-1\tbash\t/tmp' -- key bar-term-1 C-u Enter
+contains "key: several at once, in order" "send-keys -t bar-term-1 -- C-u Enter" "$(called)"
+
+run typenone -- type bar-term-1
+check "type with nothing to type is an error" "2" "$status"
+
 # ---- reading the screen ----------------------------------------------------
 run capture FAKE_SESSIONS="bar-term-1	bash	/tmp" FAKE_CAPTURE="one
 two
