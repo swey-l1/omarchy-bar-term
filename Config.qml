@@ -35,6 +35,24 @@ Item {
   // manifest's range: zero tabs would leave the pad with nothing to draw.
   readonly property int tabs: Math.max(1, Math.min(6, setting("tabs", 4)))
 
+  // Which tmux session each tab shows. Empty means the tab's own, and that is
+  // the default rather than writing four keys nobody asked for into shell.json.
+  // A key family through one function, so the name is built in one place.
+  function sessionKey(n) { return "session" + n }
+  function defaultSession(n) { return "bar-term-" + n }
+  function sessionFor(n) {
+    var s = String(setting(sessionKey(n), "")).trim()
+    return s === "" ? defaultSession(n) : s
+  }
+  function writeSession(n, name) {
+    var s = String(name || "").trim()
+    var patch = ({})
+    // Its own session is stored as nothing at all, so a tab that was pointed
+    // somewhere and then put back leaves no trace behind in the settings.
+    patch[sessionKey(n)] = (s === "" || s === defaultSession(n)) ? "" : s
+    return persist(patch)
+  }
+
   // updateEntryInline REPLACES the entry with { id } plus whatever it is handed,
   // so any key omitted here is silently dropped from shell.json. Always send
   // the current settings merged with the change.

@@ -6,9 +6,15 @@ import QtQuick
 Item {
   id: s
 
-  // 1-based, and the same number the shim uses to name the tmux session, so a
-  // tab and `bar-term capture 3` are talking about the same thing.
+  // 1-based tab number.
   property int index: 1
+
+  // The tmux session this tab is showing, and whether that is the one the tab
+  // would make for itself. A borrowed session is the user's own -- made in a
+  // terminal, maybe long before this widget existed -- so the pad says so, and
+  // nothing destructive should be reachable without noticing which it is.
+  property string name: "bar-term-" + index
+  readonly property bool owned: name === "bar-term-" + index
 
   // The session's screen, as lines. Replaced wholesale on each capture rather
   // than appended to: the shell owns the scrollback now, and a redrawn screen
@@ -66,6 +72,10 @@ Item {
   // back blank.
   property string cwd: ""
   readonly property string tabLabel: {
+    // A borrowed session is known by its name: that is what the user called it
+    // and how they will look for it. Ours are known by where they are, since
+    // "bar-term-2" says nothing.
+    if (!owned) return name.length > 10 ? name.substring(0, 10) : name
     var c = String(cwd || "")
     if (c === "" || c === "-") return ""
     if (c === "/") return "/"

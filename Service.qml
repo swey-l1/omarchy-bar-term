@@ -14,6 +14,8 @@ Item {
   id: svc
 
   property var bar: null
+  // Told by the Panel, which reads them from Config: one session name per tab.
+  property var names: []
   property int tabCount: 4
   property int activeTab: 0
   property string workdir: ""
@@ -36,7 +38,11 @@ Item {
 
   Instantiator {
     model: svc.tabCount
-    delegate: Session { index: model.index + 1 }
+    delegate: Session {
+      index: model.index + 1
+      name: svc.names.length > model.index && svc.names[model.index] !== ""
+          ? svc.names[model.index] : "bar-term-" + (model.index + 1)
+    }
     onObjectAdded: function(index, object) {
       var a = svc.sessions.slice(); a.splice(index, 0, object); svc.sessions = a
     }
@@ -60,6 +66,10 @@ Item {
     bar.run(shimCmd(args))
   }
 
+  // Every verb names the session rather than the tab, so a tab pointed at
+  // somebody else's session drives that one and nothing has to translate.
+  function verb(name, args) { fire(name + " " + Util.shellQuote(args) ) }
+
   function send(cmd) {
     var c = String(cmd || "").trim()
     if (c === "" || !active) return false
@@ -69,21 +79,31 @@ Item {
     // should look busy the instant Enter is pressed.
     active.sessionState = active.stateName.running
     active.lastExit = -1
-    fire("send " + (activeTab + 1) + " " + Util.shellQuote(c))
+    fire("send " + Util.shellQuote(active.name) + " " + Util.shellQuote(c))
     captureSoon.restart()
     return true
   }
 
-  function interrupt() { if (active) { fire("interrupt " + (activeTab + 1)); captureSoon.restart() } }
-  function reset()     { if (active) { fire("reset " + (activeTab + 1)); captureSoon.restart() } }
-  function restart()   { if (active) { fire("restart " + (activeTab + 1)); active.lines = []; captureSoon.restart() } }
-  function attach()    { if (active) fire("attach " + (activeTab + 1)) }
+  function interrupt() { if (active) { verb("interrupt", active.name); captureSoon.restart() } }
+  function reset()     { if (active) { verb("reset", active.name); captureSoon.restart() } }
+  function restart()   { if (active) { verb("restart", active.name); active.lines = []; captureSoon.restart() } }
+  function attach()    { if (active) verb("attach", active.name) }
 
   // ---- reading back --------------------------------------------------------
 
+  // Quoted one by one: a session the user made can be called anything.
+  readonly property string stateArgs: {
+    var a = []
+    for (var i = 0; i < sessions.length; i++) a.push(Util.shellQuote(sessions[i].name))
+    return a.join(" ")
+  }
+
   Process {
     id: statePoll
-    command: ["bash", "-c", svc.shimCmd("states " + svc.tabCount)]
+    command: ["bash", "-c", svc.shimCmd("states " + svc.stateArgs)]
+    // Nothing to ask about before the sessions exist, and `states` with no
+    // names is a usage error.
+    running: false
     stdout: SplitParser {
       onRead: function(line) {
         var t = String(line).trim()
@@ -105,7 +125,8 @@ Item {
 
   Process {
     id: capture
-    command: ["bash", "-c", svc.shimCmd("capture " + (svc.activeTab + 1) + " " + svc.maxLines)]
+    command: ["bash", "-c", svc.shimCmd("capture "
+              + (svc.active ? Util.shellQuote(svc.active.name) : "''") + " " + svc.maxLines)]
     property var buf: []
     stdout: SplitParser { onRead: function(line) { capture.buf.push(String(line)) } }
     onExited: function(code, status) {
@@ -115,8 +136,31 @@ Item {
     onRunningChanged: if (running) buf = []
   }
 
-  function pollStates()  { if (!statePoll.running) statePoll.running = true }
+  function pollStates()  { if (!statePoll.running && sessions.length > 0) statePoll.running = true }
   function pollCapture() { if (!capture.running && svc.active) capture.running = true }
+
+  // Every session on the server, for choosing one. Read on demand rather than
+  // polled: it is only looked at while the picker is open.
+  property var available: []
+  Process {
+    id: lister
+    command: ["bash", "-c", svc.shimCmd("list")]
+    property var buf: []
+    onRunningChanged: if (running) buf = []
+    stdout: SplitParser {
+      onRead: function(line) {
+        // "<name>\t<cwd>": tab-separated because a session name may have spaces.
+        var parts = String(line).split("\t")
+        if (parts[0] !== "") lister.buf.push({ name: parts[0], path: parts.length > 1 ? parts[1] : "" })
+      }
+    }
+    onExited: function(code, status) { svc.available = lister.buf; lister.buf = [] }
+  }
+  function refreshList() { if (!lister.running) lister.running = true }
+
+  // After a tab is pointed at a different session, so the strip and the screen
+  // catch up at once instead of on the next tick.
+  function pollStatesSoon() { captureSoon.restart() }
 
   // While the pad is open, often enough that typing feels like typing. While it
   // is shut, only often enough to keep the bar icon honest about a command left

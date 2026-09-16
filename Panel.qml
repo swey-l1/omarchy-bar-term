@@ -31,6 +31,7 @@ Theme {
     id: svc
     bar: root.bar
     tabCount: cfg.tabs
+    names: root.sessionNames
     activeTab: root.activeTab
     workdir: cfg.workdir
     maxLines: cfg.maxLines
@@ -38,6 +39,26 @@ Theme {
   }
 
   property int activeTab: 0
+
+  // Which session each tab shows, read back out of the settings so a tab that
+  // was pointed somewhere stays pointed there across a restart.
+  readonly property var sessionNames: {
+    var out = []
+    for (var i = 1; i <= cfg.tabs; i++) out.push(cfg.sessionFor(i))
+    return out
+  }
+  function ownSessionName(i) { return cfg.defaultSession(i + 1) }
+  function bindSession(i, name) {
+    if (i < 0 || i >= cfg.tabs) return
+    cfg.writeSession(i + 1, name)
+    // The screen being shown belongs to the session that was there a moment
+    // ago; blank it rather than leaving the wrong one up until the next poll.
+    if (sessions.length > i) sessions[i].lines = []
+    svc.pollStatesSoon()
+  }
+  readonly property var availableSessions: svc.available
+  function refreshSessionList() { svc.refreshList() }
+
   readonly property var sessions: svc.sessions
   readonly property var session: svc.active
 
@@ -99,6 +120,7 @@ Theme {
   // than every binding knowing about the pad's internals.
   function submitPrompt()   { pad.submit() }
   function recallInto(step) { pad.recall(step) }
+  function pickSession()    { pad.togglePicker() }
 
   Bindings { id: bindings; panel: root }
   readonly property var keyHelp: bindings.keyHelp

@@ -6,19 +6,90 @@
   "author": "swey-l1",
   "license": "MIT",
   "description": "A terminal session in the bar: tabs, real shells, and a key to attach one to a terminal window.",
-  "kinds": ["bar-widget"],
-  "entryPoints": { "barWidget": "Panel.qml" },
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "Panel.qml"
+  },
   "barWidget": {
     "displayName": "Bar Terminal",
     "description": "A terminal session in the bar: tabs, real shells, and a key to attach one to a terminal window.",
     "category": "Utilities",
     "allowMultiple": false,
     "defaultSection": "right",
-    "defaults": { "workdir": "", "maxLines": 200, "tabs": 4 },
+    "defaults": {
+      "workdir": "",
+      "maxLines": 200,
+      "tabs": 4,
+      "session1": "",
+      "session2": "",
+      "session3": "",
+      "session4": "",
+      "session5": "",
+      "session6": ""
+    },
     "schema": [
-      { "key": "workdir", "type": "string", "label": "Where new sessions start", "defaultValue": "" },
-      { "key": "maxLines", "type": "integer", "label": "Scrollback read (lines)", "min": 20, "max": 2000, "step": 20, "defaultValue": 200 },
-      { "key": "tabs", "type": "integer", "label": "Tabs", "min": 1, "max": 6, "step": 1, "defaultValue": 4 }
+      {
+        "key": "workdir",
+        "type": "string",
+        "label": "Where new sessions start",
+        "defaultValue": ""
+      },
+      {
+        "key": "maxLines",
+        "type": "integer",
+        "label": "Scrollback read (lines)",
+        "min": 20,
+        "max": 2000,
+        "step": 20,
+        "defaultValue": 200
+      },
+      {
+        "key": "tabs",
+        "type": "integer",
+        "label": "Tabs",
+        "min": 1,
+        "max": 6,
+        "step": 1,
+        "defaultValue": 4
+      },
+      {
+        "key": "session1",
+        "type": "string",
+        "label": "Tab 1: tmux session (blank = its own)",
+        "defaultValue": ""
+      },
+      {
+        "key": "session2",
+        "type": "string",
+        "label": "Tab 2: tmux session (blank = its own)",
+        "defaultValue": ""
+      },
+      {
+        "key": "session3",
+        "type": "string",
+        "label": "Tab 3: tmux session (blank = its own)",
+        "defaultValue": ""
+      },
+      {
+        "key": "session4",
+        "type": "string",
+        "label": "Tab 4: tmux session (blank = its own)",
+        "defaultValue": ""
+      },
+      {
+        "key": "session5",
+        "type": "string",
+        "label": "Tab 5: tmux session (blank = its own)",
+        "defaultValue": ""
+      },
+      {
+        "key": "session6",
+        "type": "string",
+        "label": "Tab 6: tmux session (blank = its own)",
+        "defaultValue": ""
+      }
     ]
   }
 }

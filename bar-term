@@ -5,15 +5,20 @@
 # outlives the widget -- the shell can restart, or you can attach to the same
 # session in a terminal and carry on where the pad left off.
 #
-#   bar-term status              "up" / "notool"
-#   bar-term ensure <n>          make session <n> exist, print its name
-#   bar-term send <n> <cmd...>   type a command into it and press Enter
-#   bar-term capture <n> [lines] print what its screen says
-#   bar-term states [count]      per session: "<n> idle|running|gone <exit> <cwd>"
-#   bar-term interrupt <n>       Ctrl+C into it
-#   bar-term reset <n>           clear its screen and scrollback
-#   bar-term restart <n>         kill it and make a fresh one
-#   bar-term attach <n>          open a terminal attached to it
+#   bar-term status                 "up" / "notool"
+#   bar-term list                   every session on the server: "<name>\t<cwd>"
+#   bar-term ensure <name>          make that session exist, print its name
+#   bar-term send <name> <cmd...>   type a command into it and press Enter
+#   bar-term capture <name> [lines] print what its screen says
+#   bar-term states <name>...       a line per name, in order: "<i> idle|running|gone <exit> <cwd>"
+#   bar-term interrupt <name>       Ctrl+C into it
+#   bar-term reset <name>           clear its screen and scrollback
+#   bar-term restart <name>         kill it and make a fresh one
+#   bar-term attach <name>          open a terminal attached to it
+#
+# Verbs take a session *name*, not a tab number, because a tab can be pointed at
+# any session on the server -- one you made yourself in a terminal, not only the
+# bar-term-<n> ones this script creates.
 #
 # The widget shells out here for all of it, so everything it can do can be done
 # by hand from a terminal, and tested without a compositor (test/bar-term.sh).
@@ -31,13 +36,14 @@ COLS="${COLS:-72}"
 ROWS="${ROWS:-40}"
 STATE_DIR="${XDG_RUNTIME_DIR:-/tmp}/bar-term"
 
-name_for() { echo "bar-term-$1"; }
-rc_file()  { echo "$STATE_DIR/$1.rc"; }
+# The exit-status file is named after the session, so it has to survive whatever
+# characters a session name is allowed to have.
+rc_file() { echo "$STATE_DIR/$(printf '%s' "$1" | tr -c 'A-Za-z0-9_.-' '_').rc"; }
 
-need_n() { [ -n "${1:-}" ] && [ "$1" -ge 1 ] 2>/dev/null || { echo "bar-term: need a session number" >&2; exit 2; }; }
+need_name() { [ -n "${1:-}" ] || { echo "bar-term: need a session name" >&2; exit 2; }; }
 
 usage() {
-  echo "usage: bar-term {status|ensure|send|capture|states|interrupt|reset|restart|attach} …" >&2
+  echo "usage: bar-term {status|list|ensure|send|capture|states|interrupt|reset|restart|attach} …" >&2
   exit 2
 }
 
@@ -47,14 +53,13 @@ have_tmux() { command -v "$TMUX_BIN" >/dev/null 2>&1; }
 # widget never has to care whether this is the first command of the session or
 # the hundredth.
 ensure() {
-  local n=$1 s; s=$(name_for "$n")
+  local s=$1
   "$TMUX_BIN" has-session -t "=$s" 2>/dev/null && { echo "$s"; return 0; }
   mkdir -p "$STATE_DIR"
   # A login-ish interactive bash with our rc file, which sources the user's own
   # and adds nothing they can see. -c is where it starts.
-  BAR_TERM_RC_FILE=$(rc_file "$n") \
-    "$TMUX_BIN" new-session -d -s "$s" -c "$WORKDIR" -x "$COLS" -y "$ROWS" \
-      "BAR_TERM_RC_FILE=$(printf %q "$(rc_file "$n")") exec bash --rcfile $(printf %q "$here/session-rc.bash") -i"
+  "$TMUX_BIN" new-session -d -s "$s" -c "$WORKDIR" -x "$COLS" -y "$ROWS" \
+    "BAR_TERM_RC_FILE=$(printf %q "$(rc_file "$s")") exec bash --rcfile $(printf %q "$here/session-rc.bash") -i"
   # Wait for the shell to have drawn its prompt before anyone types into it.
   # Keys sent to a pty whose shell has not read them yet are echoed raw and then
   # read back as input, so the first command of a session appeared twice: once
@@ -75,91 +80,97 @@ case "${1:-}" in
     have_tmux && echo up || echo notool
     ;;
 
+  list)
+    have_tmux || exit 127
+    # Every session on the server, whoever made it: a tab can be pointed at any
+    # of them. Tab-separated because a session name may contain spaces.
+    "$TMUX_BIN" list-sessions -F '#{session_name}	#{pane_current_path}' 2>/dev/null
+    ;;
+
   ensure)
-    need_n "${2:-}"; have_tmux || exit 127
+    need_name "${2:-}"; have_tmux || exit 127
     ensure "$2"
     ;;
 
   send)
-    need_n "${2:-}"; have_tmux || exit 127
-    n=$2; shift 2; [ $# -gt 0 ] || usage
-    ensure "$n" >/dev/null
-    # -l would send it literally, without Enter; two calls keep the command and
-    # the Return separate so a command containing "Enter" is not misread.
-    "$TMUX_BIN" send-keys -t "$(name_for "$n")" -l -- "$*"
-    "$TMUX_BIN" send-keys -t "$(name_for "$n")" Enter
+    need_name "${2:-}"; have_tmux || exit 127
+    s=$2; shift 2; [ $# -gt 0 ] || usage
+    ensure "$s" >/dev/null
+    # -l sends it literally, without interpreting key names; Enter goes
+    # separately so a command containing the word "Enter" is not misread.
+    "$TMUX_BIN" send-keys -t "$s" -l -- "$*"
+    "$TMUX_BIN" send-keys -t "$s" Enter
     ;;
 
   capture)
-    need_n "${2:-}"; have_tmux || exit 127
+    need_name "${2:-}"; have_tmux || exit 127
     lines=${3:-200}
     # -J joins wrapped lines back together, -S -N reaches into the scrollback.
     # A session that is gone prints nothing rather than failing: the pad shows
-    # an empty screen, and the next send brings it back.
+    # an empty screen, and the next command brings it back.
+    #
     # Trailing blanks are the rest of the pane's height, not output, and they
     # would push the real text off the top of a pad that scrolls to the end.
-    "$TMUX_BIN" capture-pane -p -J -t "$(name_for "$2")" -S "-$lines" 2>/dev/null \
+    "$TMUX_BIN" capture-pane -p -J -t "$2" -S "-$lines" 2>/dev/null \
       | sed -e :a -e '/^[[:space:]]*$/{$d;N;ba' -e '}'
     ;;
 
   states)
     have_tmux || { echo "notool"; exit 0; }
-    count=${2:-4}
+    shift; [ $# -gt 0 ] || usage
     # One call for every tab rather than one per tab: this runs on a timer, and
     # four processes a tick to draw four dots is not a reasonable price.
-    live=$("$TMUX_BIN" list-sessions -F '#{session_name} #{pane_current_command} #{pane_current_path}' 2>/dev/null)
-    for n in $(seq 1 "$count"); do
-      s=$(name_for "$n")
-      line=$(printf '%s\n' "$live" | grep -m1 "^$s ")
+    live=$("$TMUX_BIN" list-sessions -F '#{session_name}	#{pane_current_command}	#{pane_current_path}' 2>/dev/null)
+    i=0
+    for s in "$@"; do
+      i=$((i+1))
+      line=$(printf '%s\n' "$live" | grep -m1 -F "$(printf '%s\t' "$s")")
       if [ -z "$line" ]; then
-        echo "$n gone - -"
+        echo "$i gone - -"
         continue
       fi
-      rest=${line#"$s" }
-      cmd=${rest%% *}
-      # Last field and unquoted, so a path with spaces survives: the widget
-      # takes everything after the third field as the path.
-      path=${rest#"$cmd" }
-      rc=$(cat "$(rc_file "$n")" 2>/dev/null); rc=${rc:--}
+      rest=${line#*$'\t'}
+      cmd=${rest%%$'\t'*}
+      path=${rest#*$'\t'}
+      rc=$(cat "$(rc_file "$s")" 2>/dev/null); rc=${rc:--}
       # The pane's foreground command is the shell itself exactly when nothing
       # is running in it, which is the only "busy" signal a session gives.
       case "$cmd" in
-        bash|sh|zsh|fish|-bash) echo "$n idle $rc $path" ;;
-        *)                      echo "$n running $rc $path" ;;
+        bash|sh|zsh|fish|-bash) echo "$i idle $rc $path" ;;
+        *)                      echo "$i running $rc $path" ;;
       esac
     done
     ;;
 
   interrupt)
-    need_n "${2:-}"; have_tmux || exit 127
-    "$TMUX_BIN" send-keys -t "$(name_for "$2")" C-c
+    need_name "${2:-}"; have_tmux || exit 127
+    "$TMUX_BIN" send-keys -t "$2" C-c
     ;;
 
   reset)
-    need_n "${2:-}"; have_tmux || exit 127
-    s=$(name_for "$2")
-    "$TMUX_BIN" clear-history -t "$s" 2>/dev/null
+    need_name "${2:-}"; have_tmux || exit 127
+    "$TMUX_BIN" clear-history -t "$2" 2>/dev/null
     # clear-history empties the scrollback; the screen still shows what it
     # showed, so the shell is asked to redraw an empty one.
-    "$TMUX_BIN" send-keys -t "$s" -l -- "clear"
-    "$TMUX_BIN" send-keys -t "$s" Enter
+    "$TMUX_BIN" send-keys -t "$2" -l -- "clear"
+    "$TMUX_BIN" send-keys -t "$2" Enter
     ;;
 
   restart)
-    need_n "${2:-}"; have_tmux || exit 127
-    "$TMUX_BIN" kill-session -t "=$(name_for "$2")" 2>/dev/null
+    need_name "${2:-}"; have_tmux || exit 127
+    "$TMUX_BIN" kill-session -t "=$2" 2>/dev/null
     rm -f "$(rc_file "$2")"
     ensure "$2"
     ;;
 
   attach)
-    need_n "${2:-}"; have_tmux || exit 127
+    need_name "${2:-}"; have_tmux || exit 127
     command -v omarchy-launch-terminal >/dev/null 2>&1 || {
       echo "bar-term: omarchy-launch-terminal not found" >&2; exit 127; }
     ensure "$2" >/dev/null
     # The same session, not a new shell: attaching is the point, so whatever is
     # on the pad's screen is what the terminal opens showing.
-    omarchy-launch-terminal "$TMUX_BIN" attach -t "=$(name_for "$2")"
+    omarchy-launch-terminal "$TMUX_BIN" attach -t "=$2"
     ;;
 
   *) usage ;;

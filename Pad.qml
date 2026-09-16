@@ -31,6 +31,15 @@ KeyboardPanel {
 
   function promptText() { return prompt.text }
   function setPrompt(s) { prompt.text = String(s || "") }
+  function togglePicker() { if (picker.open) picker.hide(); else picker.show() }
+
+  // The picker sees keys first while it is open, so Up, Down and Enter mean the
+  // list rather than the history, and Escape closes the list rather than the
+  // pad. Everything it does not claim carries on to the key table.
+  function handleKey(ev) {
+    if (picker.handleKey(ev)) return true
+    return panel.handleKey(ev)
+  }
   function submit() {
     if (panel.runCommand(prompt.text)) prompt.text = ""
   }
@@ -52,21 +61,28 @@ KeyboardPanel {
     width: 0
     height: 0
     Keys.forwardTo: [prompt.input]
-    Keys.onPressed: function(ev) { if (panel.handleKey(ev)) ev.accepted = true }
+    Keys.onPressed: function(ev) { if (pad.handleKey(ev)) ev.accepted = true }
   }
 
   Column {
     id: pane
     spacing: panel.gap
 
-    // ---- what the last command said ---------------------------------------
+    // ---- the session's screen, or the list of sessions --------------------
     Rectangle {
       width: panel.padWidth
       height: panel.outputHeight
       radius: 4
       color: panel.surfaceIdle
 
+      SessionPicker {
+        id: picker
+        panel: pad.panel
+        anchors.fill: parent
+      }
+
       ListView {
+        visible: !picker.open
         id: scrollback
         anchors.fill: parent
         anchors.margins: panel.inset
@@ -123,15 +139,19 @@ KeyboardPanel {
         font.pixelSize: 9
       }
 
+      // Where the session is, and its name when the tab is showing one it does
+      // not own: a borrowed session should never be mistaken for this tab's.
       PadText {
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         panel: pad.panel
-        width: parent.width * 0.6
+        width: parent.width * 0.7
         horizontalAlignment: Text.AlignRight
         elide: Text.ElideLeft
-        text: panel.workdir === "" ? "~" : panel.workdir
-        opacity: 0.4
+        text: !panel.session ? ""
+            : panel.session.owned ? panel.session.cwd
+            : panel.session.name + "  ·  " + panel.session.cwd
+        opacity: panel.session && !panel.session.owned ? 0.6 : 0.4
         font.pixelSize: 9
       }
     }
@@ -145,8 +165,8 @@ KeyboardPanel {
       fontSize: panel.monoSize + 1
       // One hook for both routes into the field: whether the key arrived here
       // directly or was forwarded by the catcher, it is offered to the same
-      // table, and anything the table does not claim is typing.
-      onKey: function(ev) { return panel.handleKey(ev) }
+      // place, and anything unclaimed is typing.
+      onKey: function(ev) { return pad.handleKey(ev) }
     }
 
     Row {

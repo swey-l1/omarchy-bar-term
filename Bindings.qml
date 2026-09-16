@@ -22,6 +22,7 @@ Item {
     { id: "clear",    keys: [Qt.Key_L], mods: Qt.ControlModifier, hint: "Ctrl+L", label: "Clear the screen",      act: function() { panel.clearOutput() } },
     { id: "terminal", keys: [Qt.Key_T], mods: Qt.ControlModifier, hint: "Ctrl+T", label: "Attach it to a terminal", act: function() { panel.openInTerminal() } },
     { id: "restart",  keys: [Qt.Key_K], mods: Qt.ControlModifier, hint: "Ctrl+K", label: "Restart this session",  act: function() { panel.restartSession() } },
+    { id: "pick",     keys: [Qt.Key_P], mods: Qt.ControlModifier, hint: "Ctrl+P", label: "Show another session here", act: function() { panel.pickSession() } },
     { id: "nextTab",  keys: [Qt.Key_Tab],                  hint: "Tab",    label: "Next tab",          act: function() { panel.cycleTab() } },
     { id: "tab1",     keys: [Qt.Key_1], mods: Qt.AltModifier, hint: "Alt+1", label: "Tab 1",             act: function() { panel.selectTab(0) } },
     { id: "tab2",     keys: [Qt.Key_2], mods: Qt.AltModifier, hint: "Alt+2", label: "Tab 2",             act: function() { panel.selectTab(1) } },

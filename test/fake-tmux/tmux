@@ -2,7 +2,9 @@
 # A stand-in for tmux, for test/bar-term.sh. Logs every call to $FAKE_LOG, one
 # per line, and answers the few questions the shim asks:
 #
-#   FAKE_SESSIONS   what list-sessions prints (and what has-session matches)
+#   FAKE_SESSIONS   one session per line, tab-separated: name, current command,
+#                   current path. Rendered to whichever fields the caller's -F
+#                   asks for, which is what makes `list` and `states` differ.
 #   FAKE_CAPTURE    what capture-pane prints
 #
 # Reached through $BAR_TERM_TMUX rather than PATH: the shim runs coreutils of
@@ -19,9 +21,19 @@ case "$1" in
   has-session)
     s=${3#=}
     grep -qx "$s" "$FAKE_LOG.killed" 2>/dev/null && exit 1
-    printf '%s\n' "${FAKE_SESSIONS:-}" | grep -q "^$s " && exit 0 || exit 1
+    # A real tab, built with printf: grep does not read "\t" as one, it reads it
+    # as the letter t, so "^name\t" quietly matched nothing and every session
+    # looked absent.
+    tab=$(printf '\t')
+    printf '%s\n' "${FAKE_SESSIONS:-}" | grep -q "^$s$tab" && exit 0 || exit 1
     ;;
-  list-sessions) printf '%s\n' "${FAKE_SESSIONS:-}" ;;
+  list-sessions)
+    [ -z "${FAKE_SESSIONS:-}" ] && exit 0
+    case "$*" in
+      *pane_current_command*) printf '%s\n' "$FAKE_SESSIONS" ;;                       # name, command, path
+      *) printf '%s\n' "$FAKE_SESSIONS" | cut -f1,3 ;;                                # name, path
+    esac
+    ;;
   capture-pane)  printf '%s' "${FAKE_CAPTURE:-}" ;;
 esac
 exit 0
