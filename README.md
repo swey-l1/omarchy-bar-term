@@ -89,8 +89,8 @@ you would rather not untangle.
 
 ## Resuming a session you already have
 
-`Ctrl+P` lists every tmux session on the server, whoever made it, and points the current
-tab at the one you pick. A session you started in a terminal this morning shows up in the
+`Ctrl+P`, or the list button in the key row, shows every tmux session on the server,
+whoever made it, and points the current tab at the one you pick. A session you started in a terminal this morning shows up in the
 bar with its scrollback intact, and typing in the pad types into it.
 
 <p align="center">
