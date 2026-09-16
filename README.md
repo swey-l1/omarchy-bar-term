@@ -16,6 +16,13 @@ Behind each tab is a tmux session, so it behaves like the terminal it is: `cd` s
 environment stays, and the session outlives the widget. Restart the shell, or log back in
 tomorrow, and your tabs are where you left them.
 
+It draws itself in whatever Omarchy theme you are running -- every colour comes from the
+bar, so there is nothing to configure and nothing to keep in step:
+
+<p align="center">
+  <img src="docs/themes.gif" alt="The same pad under Osaka Jade, Tokyo Night, Nord, Gruvbox, Catppuccin Latte and Rose Pine" width="480">
+</p>
+
 ## Requirements
 
 - Omarchy with the Quickshell-based shell (`omarchy-shell`)
