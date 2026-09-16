@@ -93,6 +93,10 @@ you would rather not untangle.
 tab at the one you pick. A session you started in a terminal this morning shows up in the
 bar with its scrollback intact, and typing in the pad types into it.
 
+<p align="center">
+  <img src="docs/picker.png" alt="Ctrl+P: every tmux session on the server, with where each one is" width="420">
+</p>
+
 A tab showing a session it did not make says so: it is labelled with the session's name
 rather than its directory, and the name appears beside the prompt. Picking the tab's own
 `bar-term-<n>` again puts it back. The choice is kept in `shell.json`, so it survives a
