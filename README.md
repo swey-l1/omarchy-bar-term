@@ -110,7 +110,8 @@ interrupts, `Ctrl+L` clears, `Ctrl+W` kills a word. There is no line editor of t
 widget's own to be worse than the one you already have.
 
 The buttons under the screen do the common ones for you, and are the half you do not have
-to remember.
+to remember. The broom does slightly more than `Ctrl+L`: the key clears the shell's screen,
+the button drops the pad's scrollback with it.
 
 </details>
 

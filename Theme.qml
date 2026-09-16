@@ -67,7 +67,7 @@ Item {
   readonly property int outputHeight:  Style.space(230)
   // A whole number of rows, so when there are more bindings than fit, the list
   // scrolls from a clean edge instead of cutting one in half and looking broken.
-  readonly property int helpListRows:   14
+  readonly property int helpListRows:   15
   readonly property int helpListHeight: helpRowHeight * helpListRows
 
   // Output is read as columns as often as prose (ls, ps, a stack trace), so it

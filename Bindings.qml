@@ -22,7 +22,7 @@ Item {
     // clears its screen, which leaves the pad still showing the scrollback it
     // reads back; the button drops the scrollback as well, which is what someone
     // pressing a broom in a widget means by it.
-    { id: "clear",    keys: [], hint: "Ctrl+L", shell: true, label: "Clear the screen, and the scrollback with it", act: function() { panel.clearOutput() } },
+    { id: "clear",    keys: [], hint: "Ctrl+L", shell: true, label: "Clear the screen", act: function() { panel.clearOutput() } },
     { id: "complete", keys: [], hint: "Tab",    shell: true, label: "Complete (the shell's)", act: function() { panel.sendKey("Tab") } },
     { id: "history",  keys: [], hint: "Up",     shell: true, label: "Previous command (the shell's)", act: function() { panel.sendKey("Up") } },
 
