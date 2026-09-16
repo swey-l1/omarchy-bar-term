@@ -1,35 +1,63 @@
-# Bar Terminal
-
-A terminal session in the Omarchy bar. Click the icon, type a command, read what it said,
-and carry on with whatever you were doing. Each tab is a real shell that stays where you
-left it, and any of them can be opened in a terminal window without losing its place.
-
 <p align="center">
-  <img src="docs/pad.png" alt="The pad: a session's screen, its result line, and the tab strip along the foot" width="420">
+  <img src="./assets/readme/hero.svg" width="100%" alt="Bar Terminal: an Omarchy bar widget whose tabs are tmux sessions, with a prompt, the session's screen, and a key to attach any tab to a terminal window">
 </p>
 
-It is for the commands that are not worth opening a window for: a `git log`, a `df -h`, a
-`systemctl status`, the thing you want to check without losing the window you are in. The
-icon tells you how the last one went from across the screen.
+<p align="center">
+  <img src="./docs/pad.png" width="31%" align="top" alt="The pad: a session's screen, the result line, and the tab strip along the foot">
+  <img src="./docs/picker.png" width="31%" align="top" alt="Ctrl+P: every tmux session on the server, with where each one is">
+  <img src="./docs/running.png" width="31%" align="top" alt="A command running in a tab: the result line says so and the tab keeps a pulsing dot">
+</p>
 
-Behind each tab is a tmux session, so it behaves like the terminal it is: `cd` sticks, the
-environment stays, and the session outlives the widget. Restart the shell, or log back in
-tomorrow, and your tabs are where you left them.
+<p align="center">
+  <sub>As it opens · choosing which session a tab shows · something running in another tab</sub>
+</p>
 
-It draws itself in whatever Omarchy theme you are running -- every colour comes from the
+A command line in the Omarchy bar, for the things not worth opening a window for: a
+`git log`, a `df -h`, a `systemctl status`. Behind each tab is a tmux session, so it
+behaves like the terminal it is. `cd` sticks, the environment stays, and the session
+outlives the widget: restart the shell, or log back in tomorrow, and your tabs are where
+you left them.
+
+<p align="center">
+  <img src="./assets/readme/how-it-works.svg" width="100%" alt="How a command reaches your shell: typing in the pad's prompt makes one bar-term call, which types the command into a tmux session where your own bash runs it, and the pad reads that session's screen back">
+</p>
+
+It draws itself in whatever Omarchy theme you are running. Every colour comes from the
 bar, so there is nothing to configure and nothing to keep in step:
 
 <p align="center">
-  <img src="docs/themes.gif" alt="The same pad under Osaka Jade, Tokyo Night, Nord, Gruvbox, Catppuccin Latte and Rose Pine" width="480">
+  <img src="./docs/themes.gif" width="46%" alt="The same pad under Tokyo Night, Nord, Gruvbox, Catppuccin Latte, Rose Pine and Osaka Jade">
 </p>
 
-## Requirements
+<p align="center">
+  <img src="./assets/readme/section-install.svg" width="100%" alt="01 Install: get it into the bar">
+</p>
+
+<a name="requirements"></a>
+<p align="center">
+  <img src="./assets/readme/sub-requirements.svg" width="100%" alt="01.1 Requirements">
+</p>
 
 - Omarchy with the Quickshell-based shell (`omarchy-shell`)
 - `tmux`, which is what each tab actually is
 - `omarchy-launch-terminal`, for opening a session in a terminal window
 
-## Install
+<p align="center">
+  <img src="./assets/readme/code-tmux.svg" width="100%" alt="Install tmux with: omarchy-pkg-add tmux">
+</p>
+
+```bash
+omarchy-pkg-add tmux
+```
+
+<a name="one-command"></a>
+<p align="center">
+  <img src="./assets/readme/sub-one-command.svg" width="100%" alt="01.2 One command">
+</p>
+
+<p align="center">
+  <img src="./assets/readme/code-install.svg" width="100%" alt="In a terminal: omarchy plugin add https://github.com/swey-l1/omarchy-bar-term --enable. The --enable flag is what puts the widget into the bar.">
+</p>
 
 ```bash
 omarchy plugin add https://github.com/swey-l1/omarchy-bar-term --enable
@@ -42,17 +70,27 @@ To remove it:
 omarchy plugin remove io.github.swey-l1.bar-term
 ```
 
-The plugin writes only its own entry in `shell.json`, and only when you change a setting.
+Removing the plugin leaves your tmux sessions alone; they are yours, not the widget's.
+`tmux kill-session -t bar-term-1` if you want them gone.
 
-## Use
+<p align="center">
+  <img src="./assets/readme/section-use.svg" width="100%" alt="02 Use: run things from the bar">
+</p>
 
-Click the icon in the bar, or bind the toggle to a key:
+Click the icon in the bar and type. The prompt has the keyboard as soon as the pad opens,
+so there is nothing to click first.
 
-```bash
-omarchy-shell shell toggle io.github.swey-l1.bar-term
-```
+<a name="keyboard"></a>
+<p align="center">
+  <img src="./assets/readme/sub-keyboard.svg" width="100%" alt="02.1 Keyboard">
+</p>
 
-The prompt has the keyboard as soon as the pad opens, so you can type straight away.
+<p align="center">
+  <img src="./assets/readme/keyboard.svg" width="100%" alt="The keys the pad claims: Enter runs, Up and Down walk the history, Ctrl+C interrupts, Ctrl+L clears the screen, Ctrl+T attaches the session to a terminal, Ctrl+K restarts it, Ctrl+P lists sessions, Tab and Alt+1 to Alt+4 move between tabs, Escape closes">
+</p>
+
+<details markdown="1">
+<summary>Every binding, as text</summary>
 
 | Key | What it does |
 |---|---|
@@ -68,89 +106,117 @@ The prompt has the keyboard as soon as the pad opens, so you can type straight a
 | `Alt+1` … `Alt+4` | Jump to a tab |
 | `Esc` | Close |
 
-Everything else you press is typing, which is why the list above is mostly modified keys.
+Everything else you press is typing, which is why the list is mostly modified keys. The
+same actions are on the buttons under the prompt.
 
+</details>
+
+<a name="tabs"></a>
 <p align="center">
-  <img src="docs/shortcuts.png" alt="The pad with every keyboard shortcut listed" width="420">
+  <img src="./assets/readme/sub-tabs.svg" width="100%" alt="02.2 Tabs">
 </p>
 
-**Ctrl+T** opens a terminal window *attached to the session you are looking at*, not a new
-shell: the window comes up showing exactly what the pad was showing, half-finished command
-and all. The pad closes as it goes, because it covers the screen and the new window would
-otherwise open behind it. Closing that window detaches; the session, and everything
-running in it, carries on.
+<p align="center">
+  <img src="./assets/readme/tabs.svg" width="100%" alt="A tab is a session: the active one raised, one idle elsewhere, one with a pulsing dot because something is running in it, and one showing a session you made yourself, labelled by name">
+</p>
 
-That is the way out of the pad's limits. The pad is a one-line prompt and a text view, so
-a full-screen program (`vim`, `htop`, a pager) is worth attaching for; anything that needs
-a password or asks a question can be answered either place.
+<details markdown="1">
+<summary>What each tab keeps</summary>
 
-## Tabs
+Its own directory, environment, command history and half-typed line. Switching away and
+back puts you exactly where you were.
 
-The strip along the foot is one tmux session per tab, named `bar-term-1` upwards, each
-with its own directory, environment, history and half-typed line. A tab is labelled with
-the last command word it ran, shows a pulsing dot while something is running in it, and
-turns the urgent colour if that something failed while you were looking elsewhere.
+A tab is labelled with the last part of its directory, shows a pulsing dot while something
+is running in it, and turns the urgent colour if that something failed while you were
+looking elsewhere. The bar icon pulses while *any* tab is running, which is the one thing
+the bar can tell you that the pad cannot.
 
 `Ctrl+K` throws a session away and starts it again, for when one has been left in a state
 you would rather not untangle.
 
-## Resuming a session you already have
+</details>
+
+<a name="sessions"></a>
+<p align="center">
+  <img src="./assets/readme/sub-sessions.svg" width="100%" alt="02.3 Resuming a session you already have">
+</p>
 
 `Ctrl+P`, or the list button in the key row, shows every tmux session on the server,
-whoever made it, and points the current tab at the one you pick. A session you started in a terminal this morning shows up in the
-bar with its scrollback intact, and typing in the pad types into it.
+whoever made it, and points the current tab at the one you pick. A session you started in
+a terminal this morning shows up in the bar with its scrollback intact, and typing in the
+pad types into it.
 
-<p align="center">
-  <img src="docs/picker.png" alt="Ctrl+P: every tmux session on the server, with where each one is" width="420">
-</p>
+<details markdown="1">
+<summary>What a borrowed session does and does not get</summary>
 
 A tab showing a session it did not make says so: it is labelled with the session's name
 rather than its directory, and the name appears beside the prompt. Picking the tab's own
 `bar-term-<n>` again puts it back. The choice is kept in `shell.json`, so it survives a
 restart.
 
-Two things a borrowed session does not get: its exit status, because that comes from an
-rc file only sessions this widget started are running (the result line stays blank rather
-than lying), and any assumption that it is disposable. `Ctrl+K` will still restart it if
-you ask, so read the name before you press it.
+It gets no exit status, because that comes from an rc file only sessions this widget
+started are running; the result line stays blank rather than lying. And it is not
+disposable: `Ctrl+K` will still restart it if you ask, so read the name before you press
+it.
 
-From inside another tmux session, `tmux attach -t bar-term-1` refuses -- tmux will not
-nest without being told to. Use `tmux switch-client -t bar-term-1` instead; it is the same
-server, so your client just moves.
+</details>
 
-The bar icon watches all of them: it pulses while *any* tab is running, which is the one
-thing the bar can tell you that the pad cannot.
-
-## What the icon says
-
-| Icon | Meaning |
-|---|---|
-| Normal | Nothing running, and the last command worked |
-| Pulsing, accent colour | A command is running now |
-| Urgent colour | The last command exited non-zero, or there is no shell to run commands with |
-
-A command you stopped yourself does not count as a failure.
-
-## Limits worth knowing
-
-The pad reads the session's screen a few times a second and draws it as plain text, so it
-is a good window onto a shell and a poor one onto a full-screen program: colours, cursor
-positioning and anything that redraws itself will look flat or half-finished. Attach with
-`Ctrl+T` for those.
-
-It is also a one-line prompt. Multi-line editing, and keys that belong to the shell rather
-than to the pad, happen in the attached terminal.
-
+<a name="attaching"></a>
 <p align="center">
-  <img src="docs/running.png" alt="A command running in tab 3: the result line says so and the tab keeps a dot" width="420">
+  <img src="./assets/readme/sub-attaching.svg" width="100%" alt="02.4 Attaching a session to a terminal">
 </p>
 
-Neither is a limit on what you can run: the session is a real shell, and `Ctrl+T` is
-always one key away.
+`Ctrl+T` opens a terminal window attached to the session you are looking at, not a new
+shell: the window comes up showing exactly what the pad was showing, half-finished command
+and all. The pad closes as it goes, because it covers the screen and the new window would
+otherwise open behind it. Closing that window detaches; the session, and everything
+running in it, carries on.
 
-## Settings
+<p align="center">
+  <img src="./assets/readme/code-attach.svg" width="100%" alt="Reaching a session without the pad: tmux attach -t bar-term-1, or tmux switch-client -t bar-term-1 when you are already inside tmux">
+</p>
 
-Set these in `~/.config/omarchy/shell.json`, under this widget's entry in the bar layout.
+<details markdown="1">
+<summary>Reaching a session without the pad</summary>
+
+```bash
+tmux attach -t bar-term-1        # from any terminal
+tmux switch-client -t bar-term-1 # from inside another tmux session
+```
+
+`attach` refuses from inside tmux (*sessions should be nested with care*). `switch-client`
+is the one you want there: it is the same server, so your client just moves.
+
+</details>
+
+<a name="optional-hotkey"></a>
+<p align="center">
+  <img src="./assets/readme/sub-hotkey.svg" width="100%" alt="02.5 Optional hotkey">
+</p>
+
+<p align="center">
+  <img src="./assets/readme/code-hotkey.svg" width="100%" alt="In ~/.config/hypr/bindings.lua: o.bind SUPER SHIFT T, Bar terminal, omarchy-shell shell toggle io.github.swey-l1.bar-term">
+</p>
+
+<details markdown="1">
+<summary>The line to add</summary>
+
+```lua
+o.bind("SUPER SHIFT", "T", "Bar terminal", "omarchy-shell shell toggle io.github.swey-l1.bar-term")
+```
+
+</details>
+
+<p align="center">
+  <img src="./assets/readme/section-settings.svg" width="100%" alt="03 Settings: what shell.json holds">
+</p>
+
+<p align="center">
+  <img src="./assets/readme/settings.svg" width="100%" alt="An example entry in shell.json: id, workdir for where a new session starts, tabs, maxLines, and session2 pointing tab 2 at a session called notes">
+</p>
+
+<details markdown="1">
+<summary>Every key</summary>
 
 | Key | Default | What |
 |---|---|---|
@@ -163,24 +229,81 @@ Set these in `~/.config/omarchy/shell.json`, under this widget's entry in the ba
 { "id": "io.github.swey-l1.bar-term", "workdir": "/home/you/src", "tabs": 3 }
 ```
 
-## How it works
+</details>
+
+<a name="limits"></a>
+<p align="center">
+  <img src="./assets/readme/sub-limits.svg" width="100%" alt="03.1 Limits worth knowing">
+</p>
+
+The pad reads the session's screen a few times a second and draws it as plain text, so it
+is a good window onto a shell and a poor one onto a full-screen program: colours, cursor
+positioning and anything that redraws itself will look flat or half-finished. It is also a
+one-line prompt.
+
+Neither is a limit on what you can run. The session is a real shell, and `Ctrl+T` is
+always one key away.
+
+<a name="using-the-shim-directly"></a>
+<p align="center">
+  <img src="./assets/readme/sub-shim.svg" width="100%" alt="03.2 Using the shim directly">
+</p>
+
+<p align="center">
+  <img src="./assets/readme/code-shim.svg" width="100%" alt="What the widget runs, by hand: bar-term list, bar-term send bar-term-1 with a command, bar-term capture bar-term-1 40, bar-term states with session names">
+</p>
+
+<details markdown="1">
+<summary>The verbs</summary>
+
+```bash
+bar-term list                          # every session on the server
+bar-term send bar-term-1 'ls -la'      # type a command into one
+bar-term capture bar-term-1 40         # what the pad would be showing
+bar-term states bar-term-1 notes       # a line per name: idle | running | gone
+bar-term attach bar-term-1             # open a terminal on it
+```
+
+Every verb takes a session *name*, which is what lets a tab show a session it did not
+make.
+
+</details>
+
+<p align="center">
+  <img src="./assets/readme/section-development.svg" width="100%" alt="04 Development: how it is built">
+</p>
+
+<p align="center">
+  <img src="./assets/readme/code-dev.svg" width="100%" alt="The loop: qmllint, the shim test, omarchy plugin update, omarchy restart shell">
+</p>
+
+<details markdown="1">
+<summary>The loop, and what is testable</summary>
+
+```bash
+/usr/lib/qt6/bin/qmllint *.qml            # QML, as far as it can see
+./test/bar-term.sh                        # 25 cases against a fake tmux
+omarchy plugin update io.github.swey-l1.bar-term --yes
+omarchy restart shell
+```
 
 The QML never runs anything itself. `bar-term`, a plain bash script, owns every
-conversation with tmux: listing sessions, making one, typing into it, reading its screen
-back, interrupting it, and attaching a terminal to it. Its verbs take a session name, not
-a tab number, which is what lets a tab show a session it did not make. The widget shells out to that script and
-polls. It is also the only part with tests (`./test/bar-term.sh`, 25 cases against a fake
-tmux), because it is the only part that can be tested without a compositor.
+conversation with tmux, and it is the only part with tests, because it is the only part
+that can be tested without a compositor.
 
 Each session runs `bash` with an rc file that sources your own `~/.bashrc` and adds one
 thing: a `PROMPT_COMMAND` entry that writes the last exit status to a file. That is how
 the pad knows a command failed without printing anything you would see, in the pad or in
 an attached terminal.
 
-## Developing
+More in [DEVELOPING.md](DEVELOPING.md).
 
-See [DEVELOPING.md](DEVELOPING.md).
+</details>
 
-## Licence
+<p align="center">
+  <sub>MIT. See <a href="LICENSE">LICENSE</a>.</sub>
+</p>
 
-MIT.
+<p align="center">
+  <a href="https://github.com/oil-oil/beautify-github-readme"><img src="./assets/readme/made-with-beautify.svg" width="300" alt="README made with beautify-github-readme"></a>
+</p>

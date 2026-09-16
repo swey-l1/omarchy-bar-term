@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
+  <title id="title">Bar Terminal, an Omarchy bar widget</title>
+  <desc id="desc">A terminal session in the Omarchy bar: tabs backed by tmux sessions, a prompt, the session's screen, and a key to attach any tab to a terminal window. The right side shows the pad as it draws: output, prompt, key row and tab strip.</desc>
+  <rect x="0" y="0" width="1200" height="360" rx="26" fill="#1A1B26"/>
+  <text x="64" y="76" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#7AA2F7" letter-spacing="2">OMARCHY BAR WIDGET · TMUX</text>
+  <text x="62" y="146" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="64" fill="#C0CAF5" font-weight="700">Bar Terminal</text>
+  <text x="64" y="196" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" fill="#A9B1D6">A terminal session in the bar. Type a command,</text>
+  <text x="64" y="228" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" fill="#A9B1D6">read what it said, and carry on with what you</text>
+  <text x="64" y="260" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" fill="#A9B1D6">were doing. Each tab is a real shell that stays put.</text>
+  <text x="64" y="312" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#565F89">QML + bash  ·  tmux sessions  ·  four tabs  ·  attach any of them  ·  MIT</text>
+  <g transform="translate(840 30) scale(1.0)">
+  <rect x="0" y="0" width="300" height="300" rx="12" fill="#1A1B26" stroke="#7AA2F7" stroke-width="2"/>
+  <rect x="12" y="12" width="276" height="150" rx="8" fill="#24283B"/>
+  <text x="24" y="36" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" fill="#A9B1D6">$ git log --oneline -2</text>
+  <text x="24" y="58" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" fill="#565F89">c380bcf the session list</text>
+  <text x="24" y="80" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" fill="#565F89">2150760 a picture of it</text>
+  <text x="24" y="154" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#7AA2F7">ok</text>
+  <rect x="12" y="168" width="276" height="30" rx="6" fill="#24283B" stroke="#7AA2F7" stroke-width="1"/>
+  <text x="24" y="188" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" fill="#565F89">command</text>
+  <rect x="12" y="208" width="41" height="34" rx="6" fill="#24283B"/>
+  <rect x="59" y="208" width="41" height="34" rx="6" fill="#24283B"/>
+  <rect x="106" y="208" width="41" height="34" rx="6" fill="#24283B"/>
+  <rect x="153" y="208" width="41" height="34" rx="6" fill="#24283B"/>
+  <rect x="200" y="208" width="41" height="34" rx="6" fill="#24283B"/>
+  <rect x="247" y="208" width="41" height="34" rx="6" fill="#24283B"/>
+  <text x="23" y="230" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#A9B1D6">RUN</text>
+  <rect x="12" y="252" width="64" height="26" rx="6" fill="#24283B"/>
+  <text x="44" y="269" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#A9B1D6" text-anchor="middle">1 ~/src</text>
+  <rect x="82" y="252" width="64" height="26" rx="6" fill="#1A1B26"/>
+  <text x="114" y="269" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#565F89" text-anchor="middle">2 etc</text>
+  <rect x="152" y="252" width="64" height="26" rx="6" fill="#1A1B26"/>
+  <text x="184" y="269" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#565F89" text-anchor="middle">3 ~</text>
+  <rect x="222" y="252" width="64" height="26" rx="6" fill="#1A1B26"/>
+  <text x="254" y="269" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#565F89" text-anchor="middle">4</text>
+  </g>
+</svg>

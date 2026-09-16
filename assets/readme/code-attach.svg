@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="170" viewBox="0 0 1200 170" role="img" aria-labelledby="title">
+  <title id="title">reaching a session without the pad</title>
+  <rect x="0" y="0" width="1200" height="170" rx="18" fill="#1A1B26"/>
+  <rect x="0" y="0" width="1200" height="46" rx="18" fill="#24283B"/>
+  <rect x="0" y="28" width="1200" height="18" rx="0" fill="#24283B"/>
+  <text x="40" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16" fill="#565F89">bash · reaching a session without the pad</text>
+  <text x="40" y="74" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#7AA2F7">$</text>
+  <text x="62" y="74" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" xml:space="preserve">tmux attach -t bar-term-1</text>
+  <text x="40" y="106" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#7AA2F7">$</text>
+  <text x="62" y="106" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" xml:space="preserve">tmux switch-client -t bar-term-1</text>
+  <text x="40" y="142" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="17" fill="#565F89">The second one is for when you are already inside tmux: attaching would refuse to nest.</text>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="108" viewBox="0 0 1200 108" role="img" aria-labelledby="title">
+  <title id="title">~/.config/hypr/bindings.lua</title>
+  <rect x="0" y="0" width="1200" height="108" rx="18" fill="#1A1B26"/>
+  <rect x="0" y="0" width="1200" height="46" rx="18" fill="#24283B"/>
+  <rect x="0" y="28" width="1200" height="18" rx="0" fill="#24283B"/>
+  <text x="40" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16" fill="#565F89">bash · ~/.config/hypr/bindings.lua</text>
+  <text x="40" y="74" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#7AA2F7">$</text>
+  <text x="62" y="74" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" xml:space="preserve">o.bind("SUPER SHIFT", "T", "Bar terminal", "omarchy-shell shell toggle io.github.swey-l1.bar-term")</text>
+</svg>

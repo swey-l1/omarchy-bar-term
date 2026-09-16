@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="84" viewBox="0 0 1200 84" role="img" aria-labelledby="title">
+  <title id="title">02.4 Attaching a session to a terminal</title>
+  <rect x="0" y="0" width="1200" height="84" rx="16" fill="#1A1B26"/>
+  <rect x="40" y="24" width="4" height="36" rx="2" fill="#7AA2F7"/>
+  <text x="60" y="34" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16" fill="#565F89" letter-spacing="2">02.4</text>
+  <text x="60" y="66" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="32" fill="#C0CAF5" font-weight="700">Attaching a session to a terminal</text>
+</svg>

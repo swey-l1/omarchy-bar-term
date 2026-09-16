@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="150" viewBox="0 0 1200 150" role="img" aria-labelledby="title">
+  <title id="title">04 How it is built</title>
+  <rect x="0" y="0" width="1200" height="150" rx="22" fill="#1A1B26"/>
+  <text x="56" y="40" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#7AA2F7" letter-spacing="2.4">04 · DEVELOPMENT</text>
+  <rect x="56" y="54" width="44" height="4" rx="2" fill="#7AA2F7"/>
+  <text x="56" y="110" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="44" fill="#C0CAF5" font-weight="700">How it is built</text>
+  <text x="1144" y="66" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#565F89" text-anchor="end">25 shim tests</text>
+  <text x="1144" y="98" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#A9B1D6" text-anchor="end">edit · update · look</text>
+</svg>

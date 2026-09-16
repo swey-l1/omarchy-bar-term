@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="200" viewBox="0 0 1200 200" role="img" aria-labelledby="title desc">
+  <title id="title">How a command reaches your shell</title>
+  <desc id="desc">Typing in the pad's prompt makes one bar-term call, which types the command into a tmux session where your own bash runs it; the pad reads that session's screen back.</desc>
+  <rect x="0" y="0" width="1200" height="200" rx="22" fill="#1A1B26"/>
+  <text x="30" y="36" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#7AA2F7" letter-spacing="2.4">HOW A COMMAND REACHES YOUR SHELL</text>
+  <rect x="30" y="60" width="196" height="84" rx="10" fill="#24283B"/>
+  <text x="128" y="96" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="22" fill="#C0CAF5" font-weight="700" text-anchor="middle">the prompt</text>
+  <text x="128" y="124" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" fill="#565F89" text-anchor="middle">you type</text>
+  <path d="M232 102 h22 M246 96 l6 6 l-6 6" fill="none" stroke="#7AA2F7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="262" y="60" width="196" height="84" rx="10" fill="#24283B"/>
+  <text x="360" y="96" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="22" fill="#C0CAF5" font-weight="700" text-anchor="middle">bar-term send</text>
+  <text x="360" y="124" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" fill="#565F89" text-anchor="middle">one shim call</text>
+  <path d="M464 102 h22 M478 96 l6 6 l-6 6" fill="none" stroke="#7AA2F7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="494" y="60" width="196" height="84" rx="10" fill="#24283B"/>
+  <text x="592" y="96" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="22" fill="#C0CAF5" font-weight="700" text-anchor="middle">tmux session</text>
+  <text x="592" y="124" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" fill="#565F89" text-anchor="middle">bar-term-1</text>
+  <path d="M696 102 h22 M710 96 l6 6 l-6 6" fill="none" stroke="#7AA2F7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="726" y="60" width="196" height="84" rx="10" fill="#24283B"/>
+  <text x="824" y="96" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="22" fill="#C0CAF5" font-weight="700" text-anchor="middle">your bash</text>
+  <text x="824" y="124" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" fill="#565F89" text-anchor="middle">runs it</text>
+  <path d="M928 102 h22 M942 96 l6 6 l-6 6" fill="none" stroke="#7AA2F7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="958" y="60" width="196" height="84" rx="10" fill="#24283B"/>
+  <text x="1056" y="96" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="22" fill="#C0CAF5" font-weight="700" text-anchor="middle">the pad</text>
+  <text x="1056" y="124" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" fill="#565F89" text-anchor="middle">reads the screen</text>
+  <text x="30" y="178" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="17" fill="#565F89">The session outlives all of it: restart the shell, or attach the same session in a terminal, and nothing is lost.</text>
+</svg>

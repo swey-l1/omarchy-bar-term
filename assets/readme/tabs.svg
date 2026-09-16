@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="250" viewBox="0 0 1200 250" role="img" aria-labelledby="title desc">
+  <title id="title">A tab is a session</title>
+  <desc id="desc">Four tabs: the active one raised, one idle elsewhere, one with a pulsing dot because something is running in it, and one showing a session the user made in a terminal, which is labelled by name rather than by directory.</desc>
+  <rect x="0" y="0" width="1200" height="250" rx="22" fill="#1A1B26"/>
+  <text x="40" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#7AA2F7" letter-spacing="2.4">A TAB IS A SESSION</text>
+  <rect x="40" y="80" width="260" height="54" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
+  <text x="64" y="114" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" fill="#C0CAF5">1 ~/src</text>
+  <text x="44" y="162" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16" fill="#565F89">the one you are looking at</text>
+  <rect x="322" y="80" width="260" height="54" rx="8" fill="#1A1B26"/>
+  <text x="346" y="114" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" fill="#565F89">2 etc</text>
+  <text x="326" y="162" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16" fill="#565F89">somewhere else, still running</text>
+  <rect x="604" y="80" width="260" height="54" rx="8" fill="#1A1B26"/>
+  <circle cx="628" cy="107" r="6" fill="#7AA2F7"/>
+  <text x="648" y="114" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" fill="#565F89">3 ~</text>
+  <text x="608" y="162" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16" fill="#565F89">something is running in it</text>
+  <rect x="886" y="80" width="260" height="54" rx="8" fill="#1A1B26"/>
+  <text x="910" y="114" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" fill="#A9B1D6">4 notes</text>
+  <text x="890" y="162" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16" fill="#565F89">a session you made yourself</text>
+  <text x="890" y="186" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="15" fill="#7AA2F7">named, not placed: it is not this tab's own</text>
+  <text x="40" y="224" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="17" fill="#565F89">Each has its own directory, environment, history and half-typed line. The bar icon pulses while any of them is running.</text>
+</svg>

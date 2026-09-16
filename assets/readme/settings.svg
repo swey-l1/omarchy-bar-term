@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320" role="img" aria-labelledby="title desc">
+  <title id="title">The widget's entry in shell.json</title>
+  <desc id="desc">An example entry: id, workdir for where a new session starts, tabs, maxLines, and session2 pointing tab 2 at a session called notes.</desc>
+  <rect x="0" y="0" width="1200" height="320" rx="22" fill="#1A1B26"/>
+  <text x="40" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#7AA2F7" letter-spacing="1.6">~/.config/omarchy/shell.json</text>
+  <text x="40" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="17" fill="#565F89">Under bar.layout. Every key is optional; what is missing takes its default.</text>
+  <rect x="28" y="92" width="1144" height="212" rx="12" fill="#24283B"/>
+  <text x="52" y="120" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#A9B1D6">{</text>
+  <text x="72" y="154" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" xml:space="preserve">"id": "io.github.swey-l1.bar-term",</text>
+  <text x="700" y="154" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="17" fill="#565F89">← which widget this is</text>
+  <text x="72" y="188" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" xml:space="preserve">"workdir": "/home/you/src",</text>
+  <text x="700" y="188" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="17" fill="#565F89">← where a new session starts</text>
+  <text x="72" y="222" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" xml:space="preserve">"tabs": 4,</text>
+  <text x="700" y="222" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="17" fill="#565F89">← how many the strip holds, 1 to 6</text>
+  <text x="72" y="256" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" xml:space="preserve">"maxLines": 200,</text>
+  <text x="700" y="256" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="17" fill="#565F89">← how far back the pad reads</text>
+  <text x="72" y="290" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" xml:space="preserve">"session2": "notes"</text>
+  <text x="700" y="290" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="17" fill="#565F89">← tab 2 shows a session you made</text>
+  <text x="52" y="316" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#A9B1D6">}</text>
+</svg>

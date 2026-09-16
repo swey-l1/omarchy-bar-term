@@ -27,6 +27,24 @@ An Omarchy shell plugin: a bar widget whose tabs are tmux sessions. Plugin id
   `test/bar-term.sh` runs it against a fake shell and a fake terminal launcher.
 - `manifest.json`: the widget and its settings schema. Values live in the user's
   `~/.config/omarchy/shell.json`, never here.
+- `assets/readme/make-assets.py`: draws every SVG on the README. The page is a designed
+  one -- banner per heading, a picture above every table and code block -- and keeping it
+  in a script means a wording change is one line rather than a hand-edited file. The
+  palette at the top is the plugin's own, read from the theme its screenshots were taken
+  under. Re-run it after changing any of that copy:
+
+  ```sh
+  python3 assets/readme/make-assets.py            # rewrites assets/readme/*.svg
+  magick assets/readme/card.svg preview.png       # the marketplace card, from card.svg
+  ```
+
+  `preview.png` is drawn at the listing card's own ratio (384x175, `object-fit: cover`),
+  not at hero proportions, because the card crops the sides off anything wider. Check it
+  the way the site will:
+
+  ```sh
+  magick preview.png -resize 384x175^ -gravity center -extent 384x175 /tmp/card.png
+  ```
 
 ## Commands
 
@@ -119,8 +137,9 @@ pad; restart the shell.
   one with `printf` (the test fake got this wrong and matched nothing).
 - Anything printed into a session is something the user may be sitting in front of. Keep
   the widget's bookkeeping out of the pane.
-- A new key means a new `keyMap` entry, a new row in the README's key table, and a
-  retaken shortcuts screenshot: the list in the pad is generated from the table, so those
-  three are the same fact written three times and they drift silently.
+- A new key means a new `keyMap` entry, a new row in the README's key table, a keycap in
+  `keyboard_board()` in the asset generator, and a retaken shortcuts screenshot: the list
+  in the pad is generated from the table, so those are the same fact written four times
+  and they drift silently.
 - Screenshots go in `docs/`, cropped to the pad, and are checked for paths, hostnames and
   addresses before committing.
