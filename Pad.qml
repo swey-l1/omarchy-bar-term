@@ -35,10 +35,6 @@ KeyboardPanel {
   // belongs to that program and could be anywhere.
   property bool caretOn: true
   readonly property bool caretShown: panel.opened && !panel.busy && panel.usable
-  Timer {
-    interval: 550; repeat: true; running: pad.caretShown
-    onTriggered: pad.caretOn = !pad.caretOn
-  }
 
   function togglePicker() { if (picker.open) picker.hide(); else picker.show() }
 
@@ -60,6 +56,15 @@ KeyboardPanel {
     height: 0
     focus: true
     Keys.onPressed: function(ev) { if (pad.handleKey(ev)) ev.accepted = true }
+
+    // In here rather than at the pad's root: KeyboardPanel's default property is
+    // a list of items, so a Timer declared directly under it is a load error --
+    // "Cannot assign object of type QQmlTimer to list property contentItem" --
+    // and the whole widget disappears from the bar. Nothing checks this.
+    Timer {
+      interval: 550; repeat: true; running: pad.caretShown
+      onTriggered: pad.caretOn = !pad.caretOn
+    }
   }
 
   Column {
