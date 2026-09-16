@@ -175,6 +175,9 @@ KeyboardPanel {
       Key { glyph: "󰓛"; action: "kill";     unset: !panel.busy }
       Key { glyph: "󰃢"; action: "clear" }
       Key { glyph: "󰆍"; action: "terminal" }
+      // Outlined while the list is up, so the button reads as the thing holding
+      // the pad in that state rather than as one more action.
+      Key { glyph: "󰉹"; action: "pick"; marked: picker.open }
       Key { glyph: "󰅖"; action: "close" }
     }
 

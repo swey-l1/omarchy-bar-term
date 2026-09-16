@@ -53,7 +53,7 @@ Item {
   // set by what output has to be readable in and the keys are divided out of it
   // rather than the other way round.
   readonly property int padWidth:   Style.space(420)
-  readonly property int keysPerRow: 5
+  readonly property int keysPerRow: 6
   readonly property int keyWidth:   Math.floor((padWidth - gap * (keysPerRow - 1)) / keysPerRow)
   readonly property int keyHeight:  Style.space(30)
 
