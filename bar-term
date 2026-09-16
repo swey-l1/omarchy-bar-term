@@ -131,7 +131,13 @@ case "${1:-}" in
     #
     # Trailing blanks are the rest of the pane's height, not output, and they
     # would push the real text off the top of a pad that scrolls to the end.
+    # Two seds, not one with two scripts: the blank-run trim uses N to look at
+    # the next line, and a line pulled in that way never sees an earlier -e.
+    # Trailing spaces are the rest of the pane's width, and the pad draws its
+    # caret on the end of the last line: leave them and the caret floats out in
+    # the middle of nowhere.
     "$TMUX_BIN" capture-pane -p -J -t "$2" -S "-$lines" 2>/dev/null \
+      | sed 's/[[:space:]]*$//' \
       | sed -e :a -e '/^[[:space:]]*$/{$d;N;ba' -e '}'
     ;;
 
