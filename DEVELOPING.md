@@ -13,6 +13,8 @@ An Omarchy shell plugin: a bar widget whose tabs are tmux sessions. Plugin id
   metrics.
 - `Pad.qml`: the popup: scrollback, prompt, keys, tab strip, hint line, key catcher.
 - `TabButton.qml`: one tab in that strip, and the three things it has to show.
+- `SessionPicker.qml`: choosing which tmux session a tab shows. Covers the scrollback
+  while open and sees keys before the key table does.
 - `Bindings.qml`: `keyMap`, the single definition of every key binding.
 - `Config.qml`: the widget's `shell.json` entry, read and written (`setting`, `persist`).
 - `Service.qml`: the process layer. Owns one `Session` per tab, every call to the shim,
@@ -30,11 +32,13 @@ An Omarchy shell plugin: a bar widget whose tabs are tmux sessions. Plugin id
 
 ```sh
 ./bar-term status                        # up | notool (is tmux installed)
-./bar-term send 1 'ls -la'               # what the widget does, from a terminal
-./bar-term capture 1 40                  # what the pad would be showing
-./bar-term states 4                      # one line per tab: idle | running | gone
+./bar-term list                          # every session on the server
+./bar-term send bar-term-1 'ls -la'      # what the widget does, from a terminal
+./bar-term capture bar-term-1 40         # what the pad would be showing
+./bar-term states bar-term-1 notes       # a line per name, in the order asked
 tmux attach -t bar-term-1                # the session itself, no widget involved
-./test/bar-term.sh                       # 23 cases against a fake tmux
+tmux switch-client -t bar-term-1         # the same, from inside another tmux session
+./test/bar-term.sh                       # 25 cases against a fake tmux
 /usr/lib/qt6/bin/qmllint *.qml 2>&1 | grep -E '^Error'
 omarchy plugin validate .
 omarchy plugin update io.github.swey-l1.bar-term --yes       # pull commits into the install
@@ -57,8 +61,11 @@ pad; restart the shell.
 
 ## What this plugin learned the hard way
 
-- **The sessions are the product; the widget is a view onto them.** Each tab is the tmux
-  session `bar-term-<n>`. They outlive the shell, the widget and this process, which is
+- **The sessions are the product; the widget is a view onto them.** A tab shows the tmux
+  session named in `session<n>`, defaulting to `bar-term-<n>` -- it can be any session on
+  the server, including one the user made in a terminal. Every shim verb takes a *name* for
+  that reason. A borrowed session gets no exit status (no rc file) and must never be
+  treated as disposable. They outlive the shell, the widget and this process, which is
   the point: a restart loses nothing, and `tmux attach -t bar-term-1` in any terminal is
   the same session the pad is showing. Nothing here should ever kill a session the user
   did not ask to lose.
@@ -72,7 +79,7 @@ pad; restart the shell.
   processes a tick to draw four dots is not a price worth paying.
 - **Exit status comes from the session's own shell.** `session-rc.bash` sources the user's
   `~/.bashrc` and prepends one entry to `PROMPT_COMMAND` that writes `$?` to a file under
-  `$XDG_RUNTIME_DIR/bar-term/`. It must stay invisible: the user can be attached to that
+  `$XDG_RUNTIME_DIR/bar-term/`, named after the session. It must stay invisible: the user can be attached to that
   session in a terminal, and anything it printed would be theirs to look at.
 - **The prompt holds the keyboard the whole time the pad is open.** So `keyMap` is nearly
   all modified keys: bind a bare letter and that letter becomes impossible to type into a
@@ -107,6 +114,9 @@ pad; restart the shell.
 - Never write nerd-font glyphs as `\u` escapes; use the literal character.
 - `-t =name` is an exact-match *session* target. Pane targets (`send-keys`, `capture-pane`,
   `clear-history`) take the plain name; with `=` they fail with "can't find pane".
+- A session name may contain spaces, so `list` and `states` are tab-separated and every
+  name reaching the shim is `Util.shellQuote`d. `grep` does not read `\t` as a tab; build
+  one with `printf` (the test fake got this wrong and matched nothing).
 - Anything printed into a session is something the user may be sitting in front of. Keep
   the widget's bookkeeping out of the pane.
 - A new key means a new `keyMap` entry, a new row in the README's key table, and a

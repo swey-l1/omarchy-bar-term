@@ -56,6 +56,7 @@ The prompt has the keyboard as soon as the pad opens, so you can type straight a
 | `Ctrl+L` | Clear the screen |
 | `Ctrl+T` | Attach it to a terminal |
 | `Ctrl+K` | Restart this session |
+| `Ctrl+P` | Show another session in this tab |
 | `Tab` | Next tab |
 | `Alt+1` … `Alt+4` | Jump to a tab |
 | `Esc` | Close |
@@ -85,6 +86,26 @@ turns the urgent colour if that something failed while you were looking elsewher
 
 `Ctrl+K` throws a session away and starts it again, for when one has been left in a state
 you would rather not untangle.
+
+## Resuming a session you already have
+
+`Ctrl+P` lists every tmux session on the server, whoever made it, and points the current
+tab at the one you pick. A session you started in a terminal this morning shows up in the
+bar with its scrollback intact, and typing in the pad types into it.
+
+A tab showing a session it did not make says so: it is labelled with the session's name
+rather than its directory, and the name appears beside the prompt. Picking the tab's own
+`bar-term-<n>` again puts it back. The choice is kept in `shell.json`, so it survives a
+restart.
+
+Two things a borrowed session does not get: its exit status, because that comes from an
+rc file only sessions this widget started are running (the result line stays blank rather
+than lying), and any assumption that it is disposable. `Ctrl+K` will still restart it if
+you ask, so read the name before you press it.
+
+From inside another tmux session, `tmux attach -t bar-term-1` refuses -- tmux will not
+nest without being told to. Use `tmux switch-client -t bar-term-1` instead; it is the same
+server, so your client just moves.
 
 The bar icon watches all of them: it pulses while *any* tab is running, which is the one
 thing the bar can tell you that the pad cannot.
@@ -125,6 +146,7 @@ Set these in `~/.config/omarchy/shell.json`, under this widget's entry in the ba
 | `workdir` | your home directory | Where a new session starts; after that the session decides |
 | `maxLines` | `200` | How far back into the session's scrollback the pad reads |
 | `tabs` | `4` | How many sessions the strip holds (1-6) |
+| `session1` … `session6` | blank | Which tmux session that tab shows; blank means its own `bar-term-<n>` |
 
 ```json
 { "id": "io.github.swey-l1.bar-term", "workdir": "/home/you/src", "tabs": 3 }
@@ -133,9 +155,10 @@ Set these in `~/.config/omarchy/shell.json`, under this widget's entry in the ba
 ## How it works
 
 The QML never runs anything itself. `bar-term`, a plain bash script, owns every
-conversation with tmux: making a session, typing into it, reading its screen back,
-interrupting it, and attaching a terminal to it. The widget shells out to that script and
-polls. It is also the only part with tests (`./test/bar-term.sh`, 23 cases against a fake
+conversation with tmux: listing sessions, making one, typing into it, reading its screen
+back, interrupting it, and attaching a terminal to it. Its verbs take a session name, not
+a tab number, which is what lets a tab show a session it did not make. The widget shells out to that script and
+polls. It is also the only part with tests (`./test/bar-term.sh`, 25 cases against a fake
 tmux), because it is the only part that can be tested without a compositor.
 
 Each session runs `bash` with an rc file that sources your own `~/.bashrc` and adds one
