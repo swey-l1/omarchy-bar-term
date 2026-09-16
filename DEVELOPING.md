@@ -84,10 +84,17 @@ pad; restart the shell.
   `~/.bashrc` and prepends one entry to `PROMPT_COMMAND` that writes `$?` to a file under
   `$XDG_RUNTIME_DIR/bar-term/`, named after the session. It must stay invisible: the user can be attached to that
   session in a terminal, and anything it printed would be theirs to look at.
-- **The prompt holds the keyboard the whole time the pad is open.** So `keyMap` is nearly
-  all modified keys: bind a bare letter and that letter becomes impossible to type into a
-  command. Enter, Up, Down and Esc are the exceptions, and they are keys a one-line field
-  has no use for.
+- **The keyboard divides on one rule: Alt is the pad's, everything else is the shell's.**
+  Keys the pad does not claim are typed into the session, which is what makes completion,
+  readline and bash's own history work instead of being imitated. Binding anything outside
+  Alt takes a key away from the shell, and the shell has a use for nearly all of them.
+- **Keystrokes are queued through one Process, never fire-and-forget.** Two detached calls
+  can land in either order, and a shell that receives "l" then "s" when you typed "ls" is
+  worse than a slow one. Consecutive characters coalesce into a single `type`.
+- **A Timer cannot be a direct child of the pad's root.** `KeyboardPanel`'s default
+  property is a list of items, so it fails to load with "Cannot assign object of type
+  QQmlTimer to list property contentItem" and the widget vanishes from the bar. Put
+  non-visual children inside an Item.
 - **Quoting crosses two layers.** What is typed goes through `bash -c` (Quickshell's
   Process) and then through `"$*"` in the shim into `tmux send-keys -l`, which types it
   literally. `Util.shellQuote` on the whole command line is what keeps pipes and quotes

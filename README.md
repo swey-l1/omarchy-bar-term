@@ -77,8 +77,9 @@ Removing the plugin leaves your tmux sessions alone; they are yours, not the wid
   <img src="./assets/readme/section-use.svg" width="100%" alt="02 Use: run things from the bar">
 </p>
 
-Click the icon in the bar and type. The prompt has the keyboard as soon as the pad opens,
-so there is nothing to click first.
+Click the icon in the bar and type. The pad has the keyboard as soon as it opens and your
+keys go straight into the session, so it behaves like the terminal it is showing: there is
+nothing to click first, and nothing to learn that you did not already know.
 
 <a name="keyboard"></a>
 <p align="center">
@@ -86,28 +87,30 @@ so there is nothing to click first.
 </p>
 
 <p align="center">
-  <img src="./assets/readme/keyboard.svg" width="100%" alt="The keys the pad claims: Enter runs, Up and Down walk the history, Ctrl+C interrupts, Ctrl+L clears the screen, Ctrl+T attaches the session to a terminal, Ctrl+K restarts it, Ctrl+P lists sessions, Tab and Alt+1 to Alt+4 move between tabs, Escape closes">
+  <img src="./assets/readme/keyboard.svg" width="100%" alt="Alt is the pad's and everything else is the shell's: Alt+S lists sessions, Alt+T attaches one to a terminal, Alt+K restarts it, Alt and the arrows or numbers move between tabs, Escape closes; Tab completes, Enter runs, Up walks bash's history, and Ctrl+C, Ctrl+L, Ctrl+R and Ctrl+W do what they always do">
 </p>
 
 <details markdown="1">
 <summary>Every binding, as text</summary>
 
+**The pad's keys.** Alt, and Escape.
+
 | Key | What it does |
 |---|---|
-| `Enter` | Run the command |
-| `Up` | Previous command |
-| `Down` | Next command |
-| `Ctrl+C` | Interrupt the session |
-| `Ctrl+L` | Clear the screen |
-| `Ctrl+T` | Attach it to a terminal |
-| `Ctrl+K` | Restart this session |
-| `Ctrl+P` | Show another session in this tab |
-| `Tab` | Next tab |
+| `Alt+S` | Show another session in this tab |
+| `Alt+T` | Attach this session to a terminal |
+| `Alt+K` | Restart this session |
+| `Alt+←` `Alt+→` | Previous and next tab |
 | `Alt+1` … `Alt+4` | Jump to a tab |
-| `Esc` | Close |
+| `Esc` | Close the pad |
 
-Everything else you press is typing, which is why the list is mostly modified keys. The
-same actions are on the buttons under the prompt.
+**Everything else is the shell's**, typed into the session as you press it. `Tab`
+completes, `Enter` runs, `Up` walks *bash's* history, `Ctrl+R` searches it, `Ctrl+C`
+interrupts, `Ctrl+L` clears, `Ctrl+W` kills a word. There is no line editor of the
+widget's own to be worse than the one you already have.
+
+The buttons under the screen do the common ones for you, and are the half you do not have
+to remember.
 
 </details>
 
@@ -123,15 +126,16 @@ same actions are on the buttons under the prompt.
 <details markdown="1">
 <summary>What each tab keeps</summary>
 
-Its own directory, environment, command history and half-typed line. Switching away and
-back puts you exactly where you were.
+Its own directory, environment, command history and half-typed line -- all of them the
+session's rather than the widget's, so switching away and back puts you exactly where you
+were, and so does closing the pad, restarting the shell, or attaching in a terminal.
 
 A tab is labelled with the last part of its directory, shows a pulsing dot while something
 is running in it, and turns the urgent colour if that something failed while you were
 looking elsewhere. The bar icon pulses while *any* tab is running, which is the one thing
 the bar can tell you that the pad cannot.
 
-`Ctrl+K` throws a session away and starts it again, for when one has been left in a state
+`Alt+K` throws a session away and starts it again, for when one has been left in a state
 you would rather not untangle.
 
 </details>
@@ -141,7 +145,7 @@ you would rather not untangle.
   <img src="./assets/readme/sub-sessions.svg" width="100%" alt="02.3 Resuming a session you already have">
 </p>
 
-`Ctrl+P`, or the list button in the key row, shows every tmux session on the server,
+`Alt+S`, or the list button in the key row, shows every tmux session on the server,
 whoever made it, and points the current tab at the one you pick. A session you started in
 a terminal this morning shows up in the bar with its scrollback intact, and typing in the
 pad types into it.
@@ -166,7 +170,7 @@ it.
   <img src="./assets/readme/sub-attaching.svg" width="100%" alt="02.4 Attaching a session to a terminal">
 </p>
 
-`Ctrl+T` opens a terminal window attached to the session you are looking at, not a new
+`Alt+T` opens a terminal window attached to the session you are looking at, not a new
 shell: the window comes up showing exactly what the pad was showing, half-finished command
 and all. The pad closes as it goes, because it covers the screen and the new window would
 otherwise open behind it. Closing that window detaches; the session, and everything
@@ -238,11 +242,11 @@ o.bind("SUPER SHIFT", "T", "Bar terminal", "omarchy-shell shell toggle io.github
 
 The pad reads the session's screen a few times a second and draws it as plain text, so it
 is a good window onto a shell and a poor one onto a full-screen program: colours, cursor
-positioning and anything that redraws itself will look flat or half-finished. It is also a
-one-line prompt.
+positioning and anything that redraws itself will look flat or half-finished. Completion
+menus and `Ctrl+R` render as plain rows -- readable, but not pretty.
 
-Neither is a limit on what you can run. The session is a real shell, and `Ctrl+T` is
-always one key away.
+It is not a limit on what you can run. The session is a real shell, and `Alt+T` is always
+one key away.
 
 <a name="using-the-shim-directly"></a>
 <p align="center">

@@ -101,6 +101,10 @@ KeyboardPanel {
         property bool followTail: true
         onMovementEnded: followTail = atYEnd
         onModelChanged: if (followTail) Qt.callLater(positionViewAtEnd)
+        // The lines wrap, so a delegate's height is not known when the model
+        // changes: position again once the content has actually been laid out,
+        // or the newest line is left half-drawn under the bottom edge.
+        onContentHeightChanged: if (followTail) Qt.callLater(positionViewAtEnd)
 
         delegate: PadText {
           panel: pad.panel

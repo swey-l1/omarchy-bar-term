@@ -18,7 +18,11 @@ Item {
   readonly property var keyMap: [
     { id: "run",      keys: [], hint: "Enter",  shell: true, label: "Run what you typed",    act: function() { panel.sendKey("Enter") } },
     { id: "kill",     keys: [], hint: "Ctrl+C", shell: true, label: "Interrupt",             act: function() { panel.sendKey("C-c") } },
-    { id: "clear",    keys: [], hint: "Ctrl+L", shell: true, label: "Clear the screen",      act: function() { panel.sendKey("C-l") } },
+    // The key and the button differ on purpose. Ctrl+L reaches the shell and
+    // clears its screen, which leaves the pad still showing the scrollback it
+    // reads back; the button drops the scrollback as well, which is what someone
+    // pressing a broom in a widget means by it.
+    { id: "clear",    keys: [], hint: "Ctrl+L", shell: true, label: "Clear the screen, and the scrollback with it", act: function() { panel.clearOutput() } },
     { id: "complete", keys: [], hint: "Tab",    shell: true, label: "Complete (the shell's)", act: function() { panel.sendKey("Tab") } },
     { id: "history",  keys: [], hint: "Up",     shell: true, label: "Previous command (the shell's)", act: function() { panel.sendKey("Up") } },
 

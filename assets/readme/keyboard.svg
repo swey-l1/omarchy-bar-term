@@ -1,49 +1,62 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="330" viewBox="0 0 1200 330" role="img" aria-labelledby="title desc">
-  <title id="title">The keys the pad claims</title>
-  <desc id="desc">Enter runs the command, Up and Down walk the history, Ctrl+C interrupts, Ctrl+L clears, Ctrl+T attaches the session to a terminal, Ctrl+K restarts it, Ctrl+P lists sessions, Tab and Alt+1 to Alt+4 move between tabs, Escape closes the pad.</desc>
-  <rect x="0" y="0" width="1200" height="330" rx="22" fill="#1A1B26"/>
-  <text x="40" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#7AA2F7" letter-spacing="2.4">THE KEYS THE PAD CLAIMS</text>
-  <text x="40" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="17" fill="#565F89">Everything else you press is typing, which is why almost all of them are modified.</text>
-  <rect x="40" y="100" width="74" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
-  <text x="77.0" y="128" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Esc</text>
-  <text x="77.0" y="150" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">close</text>
-  <rect x="163" y="100" width="103" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
-  <text x="214.5" y="128" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Tab</text>
-  <text x="214.5" y="150" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">next tab</text>
-  <rect x="744" y="100" width="103" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
-  <text x="795.5" y="128" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Alt+1</text>
-  <text x="795.5" y="150" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">tab 1</text>
-  <rect x="857" y="100" width="103" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
-  <text x="908.5" y="128" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Alt+2</text>
-  <text x="908.5" y="150" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">tab 2</text>
-  <rect x="970" y="100" width="103" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
-  <text x="1021.5" y="128" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Alt+3</text>
-  <text x="1021.5" y="150" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">tab 3</text>
-  <rect x="1083" y="100" width="103" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
-  <text x="1134.5" y="128" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Alt+4</text>
-  <text x="1134.5" y="150" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">tab 4</text>
-  <rect x="40" y="176" width="118" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
-  <text x="99.0" y="204" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Ctrl+C</text>
-  <text x="99.0" y="226" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">interrupt</text>
-  <rect x="168" y="176" width="118" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
-  <text x="227.0" y="204" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Ctrl+K</text>
-  <text x="227.0" y="226" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">restart</text>
-  <rect x="296" y="176" width="118" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
-  <text x="355.0" y="204" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Ctrl+L</text>
-  <text x="355.0" y="226" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">clear</text>
-  <rect x="424" y="176" width="118" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
-  <text x="483.0" y="204" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Ctrl+P</text>
-  <text x="483.0" y="226" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">sessions</text>
-  <rect x="552" y="176" width="118" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
-  <text x="611.0" y="204" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Ctrl+T</text>
-  <text x="611.0" y="226" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">attach</text>
-  <rect x="40" y="252" width="74" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
-  <text x="77.0" y="280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Up</text>
-  <text x="77.0" y="302" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">previous</text>
-  <rect x="124" y="252" width="74" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
-  <text x="161.0" y="280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Down</text>
-  <text x="161.0" y="302" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">next</text>
-  <rect x="262" y="252" width="148" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
-  <text x="336.0" y="280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Enter</text>
-  <text x="336.0" y="302" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">run</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400" viewBox="0 0 1200 400" role="img" aria-labelledby="title desc">
+  <title id="title">Alt is the pad's, everything else is the shell's</title>
+  <desc id="desc">The pad answers Escape and Alt: Alt+S lists sessions, Alt+T attaches one to a terminal, Alt+K restarts it, Alt and the arrows or numbers move between tabs. Every other key is typed into the tmux session, so Tab completes, Enter runs, Up walks the shell's history, and Ctrl+C, Ctrl+L, Ctrl+R and Ctrl+W do what they do in any terminal.</desc>
+  <rect x="0" y="0" width="1200" height="400" rx="22" fill="#1A1B26"/>
+  <text x="40" y="46" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" fill="#7AA2F7" letter-spacing="2.4">ALT IS THE PAD'S</text>
+  <rect x="40" y="66" width="116" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
+  <text x="98.0" y="94" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Esc</text>
+  <text x="98.0" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">close</text>
+  <rect x="166" y="66" width="116" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
+  <text x="224.0" y="94" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Alt+S</text>
+  <text x="224.0" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">sessions</text>
+  <rect x="292" y="66" width="116" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
+  <text x="350.0" y="94" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Alt+T</text>
+  <text x="350.0" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">attach</text>
+  <rect x="418" y="66" width="116" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
+  <text x="476.0" y="94" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Alt+K</text>
+  <text x="476.0" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">restart</text>
+  <rect x="544" y="66" width="116" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
+  <text x="602.0" y="94" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Alt+←</text>
+  <text x="602.0" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">prev tab</text>
+  <rect x="670" y="66" width="116" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
+  <text x="728.0" y="94" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Alt+→</text>
+  <text x="728.0" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">next tab</text>
+  <rect x="796" y="66" width="116" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
+  <text x="854.0" y="94" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Alt+1</text>
+  <text x="854.0" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">tab 1</text>
+  <rect x="922" y="66" width="116" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
+  <text x="980.0" y="94" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Alt+2</text>
+  <text x="980.0" y="116" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">tab 2</text>
+  <rect x="40" y="142" width="116" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
+  <text x="98.0" y="170" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Alt+3</text>
+  <text x="98.0" y="192" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">tab 3</text>
+  <rect x="166" y="142" width="116" height="66" rx="8" fill="#24283B" stroke="#7AA2F7" stroke-width="1.2"/>
+  <text x="224.0" y="170" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C0CAF5" text-anchor="middle">Alt+4</text>
+  <text x="224.0" y="192" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">tab 4</text>
+  <text x="40" y="268" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" fill="#A9B1D6" letter-spacing="2.4">EVERYTHING ELSE IS THE SHELL'S</text>
+  <rect x="40" y="288" width="116" height="66" rx="8" fill="#1A1B26" stroke="#565F89" stroke-width="1.2"/>
+  <text x="98.0" y="316" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#A9B1D6" text-anchor="middle">Tab</text>
+  <text x="98.0" y="338" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">completes</text>
+  <rect x="166" y="288" width="116" height="66" rx="8" fill="#1A1B26" stroke="#565F89" stroke-width="1.2"/>
+  <text x="224.0" y="316" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#A9B1D6" text-anchor="middle">Enter</text>
+  <text x="224.0" y="338" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">runs</text>
+  <rect x="292" y="288" width="116" height="66" rx="8" fill="#1A1B26" stroke="#565F89" stroke-width="1.2"/>
+  <text x="350.0" y="316" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#A9B1D6" text-anchor="middle">Up</text>
+  <text x="350.0" y="338" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">history</text>
+  <rect x="418" y="288" width="116" height="66" rx="8" fill="#1A1B26" stroke="#565F89" stroke-width="1.2"/>
+  <text x="476.0" y="316" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#A9B1D6" text-anchor="middle">Ctrl+C</text>
+  <text x="476.0" y="338" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">interrupts</text>
+  <rect x="544" y="288" width="116" height="66" rx="8" fill="#1A1B26" stroke="#565F89" stroke-width="1.2"/>
+  <text x="602.0" y="316" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#A9B1D6" text-anchor="middle">Ctrl+L</text>
+  <text x="602.0" y="338" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">clears</text>
+  <rect x="670" y="288" width="116" height="66" rx="8" fill="#1A1B26" stroke="#565F89" stroke-width="1.2"/>
+  <text x="728.0" y="316" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#A9B1D6" text-anchor="middle">Ctrl+R</text>
+  <text x="728.0" y="338" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">searches</text>
+  <rect x="796" y="288" width="116" height="66" rx="8" fill="#1A1B26" stroke="#565F89" stroke-width="1.2"/>
+  <text x="854.0" y="316" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#A9B1D6" text-anchor="middle">Ctrl+W</text>
+  <text x="854.0" y="338" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">kills a word</text>
+  <rect x="922" y="288" width="116" height="66" rx="8" fill="#1A1B26" stroke="#565F89" stroke-width="1.2"/>
+  <text x="980.0" y="316" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#A9B1D6" text-anchor="middle">…</text>
+  <text x="980.0" y="338" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#565F89" text-anchor="middle">and the rest</text>
+  <text x="40" y="384" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="17" fill="#565F89">Keys the pad does not answer are typed into the session, which is why completion, readline and the shell's own history work here.</text>
 </svg>
