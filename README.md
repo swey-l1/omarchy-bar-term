@@ -12,9 +12,9 @@
   <sub>As it opens · choosing which session a tab shows · something running in another tab</sub>
 </p>
 
-A command line in the Omarchy bar, for the things not worth opening a window for: a
-`git log`, a `df -h`, a `systemctl status`. Behind each tab is a tmux session, so it
-behaves like the terminal it is. `cd` sticks, the environment stays, and the session
+tmux sessions in the Omarchy bar, for the things not worth opening a window for: a
+`git log`, a `df -h`, a `systemctl status`. Each tab is a real session, so it behaves like
+the terminal it is. `cd` sticks, the environment stays, and the session
 outlives the widget: restart the shell, or log back in tomorrow, and your tabs are where
 you left them.
 

@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "author": "swey-l1",
   "license": "MIT",
-  "description": "A terminal session in the bar: tabs, real shells, and a key to attach one to a terminal window.",
+  "description": "tmux sessions in your Omarchy bar: tabbed shells that stay where you left them, and a key to attach any of them to a terminal window.",
   "kinds": [
     "bar-widget"
   ],
@@ -14,7 +14,7 @@
   },
   "barWidget": {
     "displayName": "Bar Terminal",
-    "description": "A terminal session in the bar: tabs, real shells, and a key to attach one to a terminal window.",
+    "description": "tmux sessions in your Omarchy bar: tabbed shells that stay where you left them, and a key to attach any of them to a terminal window.",
     "category": "Developer Tools",
     "allowMultiple": false,
     "defaultSection": "right",

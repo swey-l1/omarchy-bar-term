@@ -4,9 +4,9 @@
   <rect x="0" y="0" width="1200" height="360" rx="26" fill="#1A1B26"/>
   <text x="64" y="76" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#7AA2F7" letter-spacing="2">OMARCHY BAR WIDGET · TMUX</text>
   <text x="62" y="146" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="64" fill="#C0CAF5" font-weight="700">Bar Terminal</text>
-  <text x="64" y="196" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" fill="#A9B1D6">A terminal session in the bar. Type a command,</text>
-  <text x="64" y="228" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" fill="#A9B1D6">read what it said, and carry on with what you</text>
-  <text x="64" y="260" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" fill="#A9B1D6">were doing. Each tab is a real shell that stays put.</text>
+  <text x="64" y="196" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" fill="#A9B1D6">tmux sessions in the bar. Type a command, read</text>
+  <text x="64" y="228" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" fill="#A9B1D6">what it said, and carry on with what you were</text>
+  <text x="64" y="260" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" fill="#A9B1D6">doing. Every tab stays where you left it.</text>
   <text x="64" y="312" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#565F89">QML + bash  ·  tmux sessions  ·  four tabs  ·  attach any of them  ·  MIT</text>
   <g transform="translate(840 30) scale(1.0)">
   <rect x="0" y="0" width="300" height="272" rx="12" fill="#1A1B26" stroke="#7AA2F7" stroke-width="2"/>
