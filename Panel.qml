@@ -121,6 +121,7 @@ Theme {
   }
 
   function pickSession() { pad.togglePicker() }
+  function scrollPage(dir) { pad.scrollPage(dir) }
 
   Bindings { id: bindings; panel: root }
   readonly property var keyHelp: bindings.keyHelp

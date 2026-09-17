@@ -38,6 +38,17 @@ KeyboardPanel {
 
   function togglePicker() { if (picker.open) picker.hide(); else picker.show() }
 
+  // The pad's own scrollback, by keyboard. PageUp and PageDown themselves go to
+  // the session like every other unclaimed key -- whatever is running in there
+  // has its own idea of what they mean -- so reading back through what the pad
+  // holds is an Alt key like the rest of the pad's own.
+  function scrollPage(dir) {
+    var step = scrollback.height * 0.9 * dir
+    scrollback.contentY = Math.max(0, Math.min(scrollback.contentY + step,
+                                               Math.max(0, scrollback.contentHeight - scrollback.height)))
+    scrollback.followTail = scrollback.atYEnd
+  }
+
   // The picker sees keys first while it is open, so Up, Down and Enter mean the
   // list rather than the history, and Escape closes the list rather than the
   // pad. Everything it does not claim carries on to the key table.
@@ -98,7 +109,13 @@ KeyboardPanel {
         //
         // Unless it is being read further up: scrolling back and being yanked
         // to the bottom twice a second would make the scrollback useless.
+        // Follow the newest output, unless the scrollback is being read further
+        // up. That has to be decided on every movement, not just at the end of
+        // one: the screen is replaced several times a second, and each
+        // replacement re-runs the scroll, so a wheel that moved the view
+        // without ending a flick was undone before it was seen.
         property bool followTail: true
+        onContentYChanged: followTail = atYEnd
         onMovementEnded: followTail = atYEnd
         onModelChanged: if (followTail) Qt.callLater(positionViewAtEnd)
         // The lines wrap, so a delegate's height is not known when the model

@@ -36,6 +36,8 @@ Item {
     { id: "tab2",     keys: [Qt.Key_2], mods: Qt.AltModifier, hint: "Alt+2", label: "Tab 2", act: function() { panel.selectTab(1) } },
     { id: "tab3",     keys: [Qt.Key_3], mods: Qt.AltModifier, hint: "Alt+3", label: "Tab 3", act: function() { panel.selectTab(2) } },
     { id: "tab4",     keys: [Qt.Key_4], mods: Qt.AltModifier, hint: "Alt+4", label: "Tab 4", act: function() { panel.selectTab(3) } },
+    { id: "scrollUp",   keys: [Qt.Key_PageUp],   mods: Qt.AltModifier, hint: "Alt+PgUp", label: "Back through the scrollback", act: function() { panel.scrollPage(-1) } },
+    { id: "scrollDown", keys: [Qt.Key_PageDown], mods: Qt.AltModifier, hint: "Alt+PgDn", label: "Forward again",                act: function() { panel.scrollPage(1) } },
     { id: "close",    keys: [Qt.Key_Q], mods: Qt.AltModifier, hint: "Alt+Q", label: "Close the pad", act: function() { panel.close() } },
     // Escape is listed so the pad says where it goes, and claimed by nothing:
     // a terminal that swallows Escape is no use for anything that reads it, and
