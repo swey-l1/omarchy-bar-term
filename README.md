@@ -111,8 +111,8 @@ interrupts, `Ctrl+L` clears, `Ctrl+W` kills a word, and `Escape`, `PageUp` and `
 are whatever the thing you are running makes of them. There is no line editor of the widget's own to be worse than
 the one you already have.
 
-Closing is `Alt+Q`, the bar icon, or whatever hotkey you bound — not `Escape`, because a
-terminal that swallows `Escape` is no use for most of what gets run in one.
+Closing is `Alt+Q`, the bar icon, or whatever hotkey you bound, not `Escape`: a terminal
+that swallows `Escape` is no use for most of what gets run in one.
 
 The buttons under the screen do the common ones for you, and are the half you do not have
 to remember. The broom does slightly more than `Ctrl+L`: the key clears the shell's screen,
@@ -297,7 +297,7 @@ make.
 
 ```bash
 /usr/lib/qt6/bin/qmllint *.qml            # QML, as far as it can see
-./test/bar-term.sh                        # 25 cases against a fake tmux
+./test/bar-term.sh                        # 36 cases against a fake tmux
 omarchy plugin update io.github.swey-l1.bar-term --yes
 omarchy restart shell
 ```

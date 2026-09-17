@@ -21,7 +21,7 @@ An Omarchy shell plugin: a bar widget whose tabs are tmux sessions. Plugin id
   and the two pollers.
 - `Session.qml`: one tab's data -- its screen, state, last exit, history and half-typed
   line. Nothing here shells out.
-- `PadKey.qml`, `Action.qml`, `Field.qml`, `FormButton.qml`, `HintArea.qml`,
+- `PadKey.qml`, `Action.qml`, `FormButton.qml`, `HintArea.qml`, `TabButton.qml`,
   `PadText.qml`: the pieces. Each takes `panel`; theme values and metrics come from it.
 - `bar-term`: a plain bash script that owns every conversation with tmux.
   `test/bar-term.sh` runs it against a fake tmux and a fake terminal launcher.
@@ -41,7 +41,7 @@ generator and the rules behind the page are in the `omarchy-plugin-dev` skill, n
 ./bar-term states bar-term-1 notes       # a line per name, in the order asked
 tmux attach -t bar-term-1                # the session itself, no widget involved
 tmux switch-client -t bar-term-1         # the same, from inside another tmux session
-./test/bar-term.sh                       # 25 cases against a fake tmux
+./test/bar-term.sh                       # 36 cases against a fake tmux
 /usr/lib/qt6/bin/qmllint *.qml 2>&1 | grep -E '^Error'
 omarchy plugin validate .
 omarchy plugin update io.github.swey-l1.bar-term --yes       # pull commits into the install

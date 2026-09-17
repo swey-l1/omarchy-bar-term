@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "io.github.swey-l1.bar-term",
   "name": "Bar Terminal",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "author": "swey-l1",
   "license": "MIT",
   "description": "A terminal session in the bar: tabs, real shells, and a key to attach one to a terminal window.",
@@ -15,7 +15,7 @@
   "barWidget": {
     "displayName": "Bar Terminal",
     "description": "A terminal session in the bar: tabs, real shells, and a key to attach one to a terminal window.",
-    "category": "Utilities",
+    "category": "Developer Tools",
     "allowMultiple": false,
     "defaultSection": "right",
     "defaults": {
