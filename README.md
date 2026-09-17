@@ -100,7 +100,7 @@ nothing to click first, and nothing to learn that you did not already know.
 | `Alt+S` | Show another session in this tab |
 | `Alt+T` | Attach this session to a terminal |
 | `Alt+K` | Restart this session |
-| `Alt+←` `Alt+→` | Previous and next tab |
+| `Alt+Left` `Alt+Right` | Previous and next tab |
 | `Alt+1` … `Alt+4` | Jump to a tab |
 | `Alt+PgUp` `Alt+PgDn` | Read back through the pad's scrollback |
 | `Alt+Q` | Close the pad |
