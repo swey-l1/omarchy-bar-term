@@ -9,28 +9,28 @@
   <text x="64" y="260" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" fill="#A9B1D6">were doing. Each tab is a real shell that stays put.</text>
   <text x="64" y="312" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#565F89">QML + bash  ·  tmux sessions  ·  four tabs  ·  attach any of them  ·  MIT</text>
   <g transform="translate(840 30) scale(1.0)">
-  <rect x="0" y="0" width="300" height="300" rx="12" fill="#1A1B26" stroke="#7AA2F7" stroke-width="2"/>
-  <rect x="12" y="12" width="276" height="150" rx="8" fill="#24283B"/>
-  <text x="24" y="36" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" fill="#A9B1D6">$ git log --oneline -2</text>
+  <rect x="0" y="0" width="300" height="272" rx="12" fill="#1A1B26" stroke="#7AA2F7" stroke-width="2"/>
+  <rect x="12" y="12" width="276" height="160" rx="8" fill="#24283B"/>
+  <text x="24" y="36" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" fill="#A9B1D6">~/src ❯ git log --oneline -2</text>
   <text x="24" y="58" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" fill="#565F89">c380bcf the session list</text>
   <text x="24" y="80" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" fill="#565F89">2150760 a picture of it</text>
-  <text x="24" y="154" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#7AA2F7">ok</text>
-  <rect x="12" y="168" width="276" height="30" rx="6" fill="#24283B" stroke="#7AA2F7" stroke-width="1"/>
-  <text x="24" y="188" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" fill="#565F89">command</text>
-  <rect x="12" y="208" width="41" height="34" rx="6" fill="#24283B"/>
-  <rect x="59" y="208" width="41" height="34" rx="6" fill="#24283B"/>
-  <rect x="106" y="208" width="41" height="34" rx="6" fill="#24283B"/>
-  <rect x="153" y="208" width="41" height="34" rx="6" fill="#24283B"/>
-  <rect x="200" y="208" width="41" height="34" rx="6" fill="#24283B"/>
-  <rect x="247" y="208" width="41" height="34" rx="6" fill="#24283B"/>
-  <text x="23" y="230" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#A9B1D6">RUN</text>
-  <rect x="12" y="252" width="64" height="26" rx="6" fill="#24283B"/>
-  <text x="44" y="269" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#A9B1D6" text-anchor="middle">1 ~/src</text>
-  <rect x="82" y="252" width="64" height="26" rx="6" fill="#1A1B26"/>
-  <text x="114" y="269" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#565F89" text-anchor="middle">2 etc</text>
-  <rect x="152" y="252" width="64" height="26" rx="6" fill="#1A1B26"/>
-  <text x="184" y="269" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#565F89" text-anchor="middle">3 ~</text>
-  <rect x="222" y="252" width="64" height="26" rx="6" fill="#1A1B26"/>
-  <text x="254" y="269" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#565F89" text-anchor="middle">4</text>
+  <text x="24" y="124" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" fill="#A9B1D6">~/src ❯ ls ~/src/</text>
+  <rect x="157" y="114" width="7" height="13" rx="0" fill="#A9B1D6"/>
+  <text x="24" y="164" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#7AA2F7">ok</text>
+  <rect x="12" y="180" width="41" height="34" rx="6" fill="#24283B"/>
+  <rect x="59" y="180" width="41" height="34" rx="6" fill="#24283B"/>
+  <rect x="106" y="180" width="41" height="34" rx="6" fill="#24283B"/>
+  <rect x="153" y="180" width="41" height="34" rx="6" fill="#24283B"/>
+  <rect x="200" y="180" width="41" height="34" rx="6" fill="#24283B"/>
+  <rect x="247" y="180" width="41" height="34" rx="6" fill="#24283B"/>
+  <text x="23" y="202" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#A9B1D6">RUN</text>
+  <rect x="12" y="224" width="64" height="26" rx="6" fill="#24283B"/>
+  <text x="44" y="241" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#A9B1D6" text-anchor="middle">1 ~/src</text>
+  <rect x="82" y="224" width="64" height="26" rx="6" fill="#1A1B26"/>
+  <text x="114" y="241" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#565F89" text-anchor="middle">2 etc</text>
+  <rect x="152" y="224" width="64" height="26" rx="6" fill="#1A1B26"/>
+  <text x="184" y="241" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#565F89" text-anchor="middle">3 ~</text>
+  <rect x="222" y="224" width="64" height="26" rx="6" fill="#1A1B26"/>
+  <text x="254" y="241" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#565F89" text-anchor="middle">4</text>
   </g>
 </svg>

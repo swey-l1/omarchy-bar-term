@@ -19,7 +19,7 @@ outlives the widget: restart the shell, or log back in tomorrow, and your tabs a
 you left them.
 
 <p align="center">
-  <img src="./assets/readme/how-it-works.svg" width="100%" alt="How a command reaches your shell: typing in the pad's prompt makes one bar-term call, which types the command into a tmux session where your own bash runs it, and the pad reads that session's screen back">
+  <img src="./assets/readme/how-it-works.svg" width="100%" alt="How a keystroke reaches your shell: a key pressed in the pad becomes one bar-term call, which types it into a tmux session where your own bash reads it, and the pad reads that session's screen back">
 </p>
 
 It draws itself in whatever Omarchy theme you are running. Every colour comes from the
