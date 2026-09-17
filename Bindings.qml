@@ -4,7 +4,8 @@ import QtQuick
 // same thing, and the line in the shortcut list are all read from `keyMap`.
 //
 // The division of the keyboard is the whole design of this widget: **Alt is the
-// pad's, everything else is the shell's.** Keys that are not claimed here are
+// pad's, everything else is the shell's** -- Escape included, so anything that
+// reads it still works in here. Keys that are not claimed here are
 // typed into the tmux session, which is what makes tab completion, readline and
 // the shell's own history work rather than being imitated badly.
 //
@@ -35,7 +36,11 @@ Item {
     { id: "tab2",     keys: [Qt.Key_2], mods: Qt.AltModifier, hint: "Alt+2", label: "Tab 2", act: function() { panel.selectTab(1) } },
     { id: "tab3",     keys: [Qt.Key_3], mods: Qt.AltModifier, hint: "Alt+3", label: "Tab 3", act: function() { panel.selectTab(2) } },
     { id: "tab4",     keys: [Qt.Key_4], mods: Qt.AltModifier, hint: "Alt+4", label: "Tab 4", act: function() { panel.selectTab(3) } },
-    { id: "close",    keys: [Qt.Key_Escape], hint: "Esc", label: "Close the pad", act: function() { panel.close() } }
+    { id: "close",    keys: [Qt.Key_Q], mods: Qt.AltModifier, hint: "Alt+Q", label: "Close the pad", act: function() { panel.close() } },
+    // Escape is listed so the pad says where it goes, and claimed by nothing:
+    // a terminal that swallows Escape is no use for anything that reads it, and
+    // that is most of what people run in one.
+    { id: "escape",   keys: [], hint: "Esc", shell: true, label: "Escape", act: function() { panel.sendKey("Escape") } }
   ]
 
   function entryFor(id) {

@@ -197,50 +197,66 @@ KeyboardPanel {
       }
     }
 
-    // Hover-only: there is nothing to click, it is just where the bindings
-    // that have no button of their own are written down.
-    Action {
-      panel: pad.panel
-      label: pad.showKeys ? "Hide shortcuts" : "Keyboard shortcuts"
-      tip: pad.showKeys ? "Hide the list" : "Show every key"
-      onPress: function() { pad.showKeys = !pad.showKeys }
-    }
+    // The foot: one row holding the shortcut toggle and the hover line, and the
+    // list the toggle opens. They share a row because they are never both
+    // interesting at once, and a row of furniture is a row the terminal above
+    // does not get.
+    Column {
+      spacing: panel.tightGap
 
-    ListView {
-      visible: pad.showKeys
-      width: panel.padWidth
-      height: Math.min(panel.helpListHeight, panel.keyHelp.length * panel.helpRowHeight)
-      clip: true
-      model: panel.keyHelp
-      boundsBehavior: Flickable.StopAtBounds
-      onVisibleChanged: if (visible) positionViewAtBeginning()
-
-      delegate: PadText {
-        panel: pad.panel
+      Item {
         width: panel.padWidth
-        height: panel.helpRowHeight
-        verticalAlignment: Text.AlignVCenter
-        leftPadding: panel.inset
-        elide: Text.ElideRight
-        text: modelData
-        opacity: 0.72
-        font.pixelSize: 9
-      }
-    }
+        height: panel.helpRowHeight + panel.tightGap
 
-    // Whatever the pointer is on, and the key that does the same thing.
-    // Fixed height, so hovering never makes the pad jump about.
-    PadText {
-      panel: pad.panel
-      width: panel.padWidth
-      height: panel.hintHeight
-      verticalAlignment: Text.AlignVCenter
-      wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-      maximumLineCount: 2
-      elide: Text.ElideRight
-      text: panel.hoverHint
-      opacity: 0.55
-      font.pixelSize: 9
+        // Hover-only: there is nothing to click, it is just where the bindings
+        // that have no button of their own are written down.
+        Action {
+          panel: pad.panel
+          width: 150
+          height: parent.height
+          label: pad.showKeys ? "Hide shortcuts" : "Keyboard shortcuts"
+          tip: pad.showKeys ? "Hide the list" : "Show every key"
+          onPress: function() { pad.showKeys = !pad.showKeys }
+        }
+
+        // Whatever the pointer is on, and the key that does the same thing.
+        // Right-aligned and elided: it is the only thing here that changes, and
+        // it must not move anything when it does.
+        PadText {
+          panel: pad.panel
+          anchors.right: parent.right
+          anchors.rightMargin: panel.inset
+          anchors.verticalCenter: parent.verticalCenter
+          width: parent.width - 160
+          horizontalAlignment: Text.AlignRight
+          elide: Text.ElideRight
+          text: panel.hoverHint
+          opacity: 0.55
+          font.pixelSize: 9
+        }
+      }
+
+      ListView {
+        visible: pad.showKeys
+        width: panel.padWidth
+        height: Math.min(panel.helpListHeight, panel.keyHelp.length * panel.helpRowHeight)
+        clip: true
+        model: panel.keyHelp
+        boundsBehavior: Flickable.StopAtBounds
+        onVisibleChanged: if (visible) positionViewAtBeginning()
+
+        delegate: PadText {
+          panel: pad.panel
+          width: panel.padWidth
+          height: panel.helpRowHeight
+          verticalAlignment: Text.AlignVCenter
+          leftPadding: panel.inset
+          elide: Text.ElideRight
+          text: modelData
+          opacity: 0.72
+          font.pixelSize: 9
+        }
+      }
     }
   }
 }

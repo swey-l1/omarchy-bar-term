@@ -60,14 +60,14 @@ Item {
   readonly property int rowHeight:     Style.space(24)  // a full-width line, a form button
   readonly property int helpRowHeight: Style.space(16)  // a line of the shortcut list
   readonly property int fieldHeight:   Style.space(28)  // the prompt
-  readonly property int hintHeight:    Style.space(26)  // the hover text along the foot, two lines
+  readonly property int hintHeight:    Style.space(15)  // the hover text along the foot, one line
 
   // The scrollback. Bounded so a long-running command cannot grow the pad off
   // the screen; it scrolls inside this instead.
   readonly property int outputHeight:  Style.space(230)
   // A whole number of rows, so when there are more bindings than fit, the list
   // scrolls from a clean edge instead of cutting one in half and looking broken.
-  readonly property int helpListRows:   15
+  readonly property int helpListRows:   16
   readonly property int helpListHeight: helpRowHeight * helpListRows
 
   // Output is read as columns as often as prose (ls, ps, a stack trace), so it
