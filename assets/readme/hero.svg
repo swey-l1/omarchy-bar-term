@@ -24,6 +24,11 @@
   <rect x="200" y="180" width="41" height="34" rx="6" fill="#24283B"/>
   <rect x="247" y="180" width="41" height="34" rx="6" fill="#24283B"/>
   <text x="23" y="202" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#A9B1D6">RUN</text>
+  <rect x="74.5" y="192" width="10" height="10" rx="1.5" fill="#A9B1D6"/>
+  <path d="M121.5 203 l7 -10 M127.5 191 l4 3 l-6 9 l-5 -3 z" fill="none" stroke="#A9B1D6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M166.5 191 h14 v12 h-14 z M169.5 195 l3 2 l-3 2 M174.5 200 h3" fill="none" stroke="#A9B1D6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M214.5 193 h12 M214.5 197 h12 M214.5 201 h12" fill="none" stroke="#A9B1D6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M262.5 192 l10 10 M272.5 192 l-10 10" fill="none" stroke="#A9B1D6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
   <rect x="12" y="224" width="64" height="26" rx="6" fill="#24283B"/>
   <text x="44" y="241" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#A9B1D6" text-anchor="middle">1 ~/src</text>
   <rect x="82" y="224" width="64" height="26" rx="6" fill="#1A1B26"/>
