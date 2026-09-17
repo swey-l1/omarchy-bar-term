@@ -36,6 +36,8 @@ Theme {
     workdir: cfg.workdir
     maxLines: cfg.maxLines
     open: root.opened
+    cols: root.padCols
+    rows: root.padRows
   }
 
   property int activeTab: 0
@@ -94,17 +96,19 @@ Theme {
     : session.lastExit === 130 ? warnColour
     : badColour
 
+  // Nothing to carry between tabs any more: what was half-typed is in the
+  // session, where it stays whether or not anyone is looking at it.
   function selectTab(i) {
     if (i < 0 || i >= sessions.length || i === activeTab) return
-    if (session) session.draft = pad.promptText()
     activeTab = i
-    pad.setPrompt(session ? session.draft : "")
-    pad.focusPrompt()
   }
-  function cycleTab() { if (sessions.length > 1) selectTab((activeTab + 1) % sessions.length) }
+  function cycleTab(step) {
+    if (sessions.length < 2) return
+    selectTab((activeTab + step + sessions.length) % sessions.length)
+  }
 
-  function runCommand(cmd) { return svc.send(cmd) }
-  function recall(step)    { return session ? session.recall(step) : null }
+  function typeText(s)     { svc.typeText(s) }
+  function sendKey(name)   { svc.sendKey(name) }
   function killCommand()   { svc.interrupt() }
   function clearOutput()   { svc.reset() }
   function restartSession(){ svc.restart() }
@@ -116,23 +120,28 @@ Theme {
     close()
   }
 
-  // The pad owns the prompt, so the key table reaches it through here rather
-  // than every binding knowing about the pad's internals.
-  function submitPrompt()   { pad.submit() }
-  function recallInto(step) { pad.recall(step) }
-  function pickSession()    { pad.togglePicker() }
+  function pickSession() { pad.togglePicker() }
+  function scrollPage(dir) { pad.scrollPage(dir) }
+  // True when the session took it, which means the pad should not also scroll.
+  function wheel(dir) { return svc.wheel(dir) }
 
   Bindings { id: bindings; panel: root }
   readonly property var keyHelp: bindings.keyHelp
   function hintFor(id)   { return bindings.hintFor(id) }
   function labelFor(id)  { return bindings.labelFor(id) }
   function runAction(id) { bindings.runAction(id) }
-  function handleKey(ev) { return bindings.handleKey(ev) }
+  // The pad takes its own keys; everything else is typed into the session. That
+  // division is the widget: the shell gets the keyboard, so completion, readline
+  // and its own history work rather than being imitated.
+  function handleKey(ev) {
+    if (bindings.handleKey(ev)) return true
+    return svc.forwardKey(ev)
+  }
 
   property bool opened: false
-  // The prompt takes the keyboard as soon as the pad is up: a terminal that
-  // needs a click before it accepts typing is a terminal nobody would use.
-  onOpenedChanged: if (opened) Qt.callLater(pad.focusPrompt)
+  // The pad takes the keyboard as soon as it is up: a terminal that needs a
+  // click before it accepts typing is a terminal nobody would use.
+  onOpenedChanged: if (opened) Qt.callLater(pad.focusControls)
   function open()   { opened = true }
   function close()  { opened = false }
   function toggle() { opened = !opened }

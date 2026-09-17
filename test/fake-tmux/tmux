@@ -30,8 +30,18 @@ case "$1" in
   list-sessions)
     [ -z "${FAKE_SESSIONS:-}" ] && exit 0
     case "$*" in
-      *pane_current_command*) printf '%s\n' "$FAKE_SESSIONS" ;;                       # name, command, path
-      *) printf '%s\n' "$FAKE_SESSIONS" | cut -f1,3 ;;                                # name, path
+      *pane_current_command*) printf '%s\n' "$FAKE_SESSIONS" ;;        # name, command, mouse, path
+      *) printf '%s\n' "$FAKE_SESSIONS" | cut -f1,4 ;;                 # name, path
+    esac
+    ;;
+  display-message)
+    # The shim asks about one pane at a time: the mouse flag, and the size it
+    # should aim a wheel at.
+    case "$*" in
+      *mouse_any_flag*) printf '%s\n' "${FAKE_MOUSE:-0}" ;;
+      *pane_width*)     printf '80\n' ;;
+      *pane_height*)    printf '24\n' ;;
+      *)                printf '\n' ;;
     esac
     ;;
   capture-pane)  printf '%s' "${FAKE_CAPTURE:-}" ;;

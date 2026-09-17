@@ -32,8 +32,8 @@ run status_notool BAR_TERM_TMUX="$tmp/no-such-tmux" -- status
 check "status: no tmux to make sessions with" "notool" "$out"
 
 # ---- every session on the server, not only ours ---------------------------
-run list FAKE_SESSIONS="bar-term-1	bash	/home/you
-work	vim	/home/you/src" -- list
+run list FAKE_SESSIONS="bar-term-1	bash	0	/home/you
+work	vim	1	/home/you/src" -- list
 check "list: offers every session, whoever made it" "bar-term-1	/home/you
 work	/home/you/src" "$out"
 
@@ -43,19 +43,35 @@ check "ensure: hands back the name it was asked for" "bar-term-2" "$out"
 contains "ensure: starts it in the configured directory" "-c /srv" "$(called)"
 contains "ensure: gives it our rc file, not the user's shell as-is" "session-rc.bash" "$(called)"
 
-run ensure_existing FAKE_SESSIONS="bar-term-2	bash	/tmp" -- ensure bar-term-2
+run ensure_existing FAKE_SESSIONS="bar-term-2	bash	0	/tmp" -- ensure bar-term-2
 absent "ensure: does not build a session that already exists" "new-session" "$(called)"
 
 # ---- sending a command -----------------------------------------------------
-run send FAKE_SESSIONS="bar-term-1	bash	/tmp" -- send bar-term-1 'git log --oneline | head -3'
+run send FAKE_SESSIONS="bar-term-1	bash	0	/tmp" -- send bar-term-1 'git log --oneline | head -3'
 contains "send: types the command literally" "send-keys -t bar-term-1 -l -- git log --oneline | head -3" "$(called)"
 contains "send: presses Enter separately" "send-keys -t bar-term-1 Enter" "$(called)"
 
 run send_makes FAKE_SESSIONS="" -- send bar-term-3 uptime
 contains "send: makes the session first if it is gone" "new-session" "$(called)"
 
+# ---- typing into it, a key at a time ---------------------------------------
+# The pad types rather than sending whole lines, so the shell's own completion
+# and line editing do the work instead of being imitated.
+run type FAKE_SESSIONS=$'bar-term-1\tbash\t0\t/tmp' -- type bar-term-1 'ls ~/sr'
+contains "type: sends the text literally, with no Enter" "send-keys -t bar-term-1 -l -- ls ~/sr" "$(called)"
+absent "type: does not press Enter" "send-keys -t bar-term-1 Enter" "$(called)"
+
+run key FAKE_SESSIONS=$'bar-term-1\tbash\t0\t/tmp' -- key bar-term-1 Tab
+contains "key: presses a named key" "send-keys -t bar-term-1 -- Tab" "$(called)"
+
+run keys FAKE_SESSIONS=$'bar-term-1\tbash\t0\t/tmp' -- key bar-term-1 C-u Enter
+contains "key: several at once, in order" "send-keys -t bar-term-1 -- C-u Enter" "$(called)"
+
+run typenone -- type bar-term-1
+check "type with nothing to type is an error" "2" "$status"
+
 # ---- reading the screen ----------------------------------------------------
-run capture FAKE_SESSIONS="bar-term-1	bash	/tmp" FAKE_CAPTURE="one
+run capture FAKE_SESSIONS="bar-term-1	bash	0	/tmp" FAKE_CAPTURE="one
 two
 
 
@@ -64,36 +80,61 @@ check "capture: drops the blank rows that are just pane height" "one
 two" "$out"
 contains "capture: reaches back through the scrollback" "-S -50" "$(called)"
 
+# ---- the wheel, when a program owns the screen ------------------------------
+# A full-screen program draws on the alternate screen, which tmux keeps no
+# history for: the pad has nothing to scroll and the wheel belongs to the
+# program. Only if it asked for one, or the escape sequence is typed as text.
+run wheel FAKE_SESSIONS=$'bar-term-1\tclaude\t1\t/tmp' FAKE_MOUSE=1 -- wheel bar-term-1 up
+contains "wheel: sends a wheel-up to a program that takes a mouse" "send-keys -t bar-term-1 -l --" "$(called)"
+
+run wheelnone FAKE_SESSIONS=$'bar-term-1\tbash\t0\t/tmp' FAKE_MOUSE=0 -- wheel bar-term-1 up
+absent "wheel: sends nothing to a shell, which has no use for it" "send-keys -t bar-term-1 -l --" "$(called)"
+
+run wheelbad FAKE_SESSIONS=$'bar-term-1\tbash\t0\t/tmp' -- wheel bar-term-1 sideways
+check "wheel: only up or down" "2" "$status"
+
+# ---- sizing it to the pad --------------------------------------------------
+run size FAKE_SESSIONS=$'bar-term-1\tbash\t0\t/tmp' -- size bar-term-1 75 19
+contains "size: makes the session the pad's size" "resize-window -t bar-term-1 -x 75 -y 19" "$(called)"
+
+run sizebad FAKE_SESSIONS=$'bar-term-1\tbash\t0\t/tmp' -- size bar-term-1 75
+check "size without both numbers is an error" "2" "$status"
+
+# Attaching hands sizing back, or the terminal inherits a window narrower than
+# it is and sits in a box.
+run attachsize FAKE_SESSIONS=$'bar-term-1\tbash\t0\t/tmp' -- attach bar-term-1
+contains "attach: gives sizing back to whatever attaches" "set-window-option -t bar-term-1 window-size latest" "$(called)"
+
 # ---- what every tab is doing, in one call ----------------------------------
 mkdir -p "$tmp/bar-term" && printf '3' > "$tmp/bar-term/bar-term-1.rc"
-run states FAKE_SESSIONS="bar-term-1	bash	/home/you/src
-work	sleep	/etc" -- states bar-term-1 work missing
-check "states: answers in the order asked, idle with its exit, running, gone" "1 idle 3 /home/you/src
-2 running - /etc
-3 gone - -" "$out"
+run states FAKE_SESSIONS="bar-term-1	bash	0	/home/you/src
+work	sleep	0	/etc" -- states bar-term-1 work missing
+check "states: in the order asked, with exit, mouse mode and place" "1 idle 3 0 /home/you/src
+2 running - 0 /etc
+3 gone - 0 -" "$out"
 check "states: one tmux call for every tab, not one each" "1" "$(grep -c list-sessions "$FAKE_LOG")"
 
 # The tab strip is labelled from this, and a session outlives the widget, so a
 # path with a space in it has to survive being the last field of the line.
 rm -f "$tmp/bar-term/bar-term-1.rc"   # a session that has not finished anything yet
-run states_spaces FAKE_SESSIONS="my work	bash	/home/you/My Projects" -- states "my work"
-check "states: a name and a path with spaces both survive" "1 idle - /home/you/My Projects" "$out"
+run states_spaces FAKE_SESSIONS="my work	bash	0	/home/you/My Projects" -- states "my work"
+check "states: a name and a path with spaces both survive" "1 idle - 0 /home/you/My Projects" "$out"
 
 # ---- the rest of the verbs -------------------------------------------------
-run interrupt FAKE_SESSIONS="bar-term-1	bash	/tmp" -- interrupt bar-term-1
+run interrupt FAKE_SESSIONS="bar-term-1	bash	0	/tmp" -- interrupt bar-term-1
 contains "interrupt: sends Ctrl+C into the session" "send-keys -t bar-term-1 C-c" "$(called)"
 
-run reset FAKE_SESSIONS="bar-term-1	bash	/tmp" -- reset bar-term-1
+run reset FAKE_SESSIONS="bar-term-1	bash	0	/tmp" -- reset bar-term-1
 contains "reset: empties the scrollback" "clear-history -t bar-term-1" "$(called)"
 contains "reset: and redraws an empty screen" "-l -- clear" "$(called)"
 
 printf '9' > "$tmp/bar-term/bar-term-1.rc"
-run restart FAKE_SESSIONS="bar-term-1	bash	/tmp" -- restart bar-term-1
+run restart FAKE_SESSIONS="bar-term-1	bash	0	/tmp" -- restart bar-term-1
 contains "restart: kills the old session" "kill-session -t =bar-term-1" "$(called)"
 contains "restart: and builds a new one" "new-session" "$(called)"
 check "restart: forgets the old session's last exit" "" "$(cat "$tmp/bar-term/bar-term-1.rc" 2>/dev/null)"
 
-run attach FAKE_SESSIONS="bar-term-1	bash	/tmp" -- attach bar-term-1
+run attach FAKE_SESSIONS="bar-term-1	bash	0	/tmp" -- attach bar-term-1
 contains "attach: opens a terminal on the same session, not a new shell" "attach -t =bar-term-1" "$(called)"
 
 # ---- refusing nonsense -----------------------------------------------------
