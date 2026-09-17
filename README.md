@@ -13,7 +13,7 @@
 </p>
 
 tmux sessions in the Omarchy bar, for the things not worth opening a window for: a
-`git log`, a `df -h`, a `systemctl status`. Each tab is a real session, so it behaves like
+`git log`, a `df -h`, a `ps aux`. Each tab is a real session, so it behaves like
 the terminal it is. `cd` sticks, the environment stays, and the session
 outlives the widget: restart the shell, or log back in tomorrow, and your tabs are where
 you left them.
@@ -30,7 +30,7 @@ bar, so there is nothing to configure and nothing to keep in step:
 </p>
 
 <p align="center">
-  <img src="./assets/readme/section-install.svg" width="100%" alt="01 Install: get it into the bar">
+  <img src="./assets/readme/section-get-it.svg" width="100%" alt="01 Install: get it into the bar">
 </p>
 
 <a name="requirements"></a>
@@ -56,7 +56,7 @@ omarchy-pkg-add tmux
 </p>
 
 <p align="center">
-  <img src="./assets/readme/code-install.svg" width="100%" alt="In a terminal: omarchy plugin add https://github.com/swey-l1/omarchy-bar-term --enable. The --enable flag is what puts the widget into the bar.">
+  <img src="./assets/readme/code-plugin-add.svg" width="100%" alt="In a terminal: omarchy plugin add https://github.com/swey-l1/omarchy-bar-term --enable. The --enable flag is what puts the widget into the bar.">
 </p>
 
 ```bash
