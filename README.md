@@ -87,7 +87,7 @@ nothing to click first, and nothing to learn that you did not already know.
 </p>
 
 <p align="center">
-  <img src="./assets/readme/keyboard.svg" width="100%" alt="Alt is the pad's and everything else is the shell's: Alt+S lists sessions, Alt+T attaches one to a terminal, Alt+K restarts it, Alt and the arrows or numbers move between tabs, Escape closes; Tab completes, Enter runs, Up walks bash's history, and Ctrl+C, Ctrl+L, Ctrl+R and Ctrl+W do what they always do">
+  <img src="./assets/readme/keyboard.svg" width="100%" alt="Alt is the pad's and everything else is the shell's: Alt+Q closes, Alt+S lists sessions, Alt+T attaches one to a terminal, Alt+K restarts it, Alt and the arrows or numbers move between tabs; Tab completes, Enter runs, Up walks bash's history, Ctrl+C, Ctrl+L and Ctrl+R do what they always do, and Escape reaches whatever is running">
 </p>
 
 <details markdown="1">
@@ -102,12 +102,16 @@ nothing to click first, and nothing to learn that you did not already know.
 | `Alt+K` | Restart this session |
 | `Alt+←` `Alt+→` | Previous and next tab |
 | `Alt+1` … `Alt+4` | Jump to a tab |
-| `Esc` | Close the pad |
+| `Alt+Q` | Close the pad |
 
 **Everything else is the shell's**, typed into the session as you press it. `Tab`
 completes, `Enter` runs, `Up` walks *bash's* history, `Ctrl+R` searches it, `Ctrl+C`
-interrupts, `Ctrl+L` clears, `Ctrl+W` kills a word. There is no line editor of the
-widget's own to be worse than the one you already have.
+interrupts, `Ctrl+L` clears, `Ctrl+W` kills a word, and `Escape` is whatever the thing
+you are running makes of it. There is no line editor of the widget's own to be worse than
+the one you already have.
+
+Closing is `Alt+Q`, the bar icon, or whatever hotkey you bound — not `Escape`, because a
+terminal that swallows `Escape` is no use for most of what gets run in one.
 
 The buttons under the screen do the common ones for you, and are the half you do not have
 to remember. The broom does slightly more than `Ctrl+L`: the key clears the shell's screen,
