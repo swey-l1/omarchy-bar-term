@@ -102,12 +102,13 @@ nothing to click first, and nothing to learn that you did not already know.
 | `Alt+K` | Restart this session |
 | `Alt+←` `Alt+→` | Previous and next tab |
 | `Alt+1` … `Alt+4` | Jump to a tab |
+| `Alt+PgUp` `Alt+PgDn` | Read back through the pad's scrollback |
 | `Alt+Q` | Close the pad |
 
 **Everything else is the shell's**, typed into the session as you press it. `Tab`
 completes, `Enter` runs, `Up` walks *bash's* history, `Ctrl+R` searches it, `Ctrl+C`
-interrupts, `Ctrl+L` clears, `Ctrl+W` kills a word, and `Escape` is whatever the thing
-you are running makes of it. There is no line editor of the widget's own to be worse than
+interrupts, `Ctrl+L` clears, `Ctrl+W` kills a word, and `Escape`, `PageUp` and `PageDown`
+are whatever the thing you are running makes of them. There is no line editor of the widget's own to be worse than
 the one you already have.
 
 Closing is `Alt+Q`, the bar icon, or whatever hotkey you bound — not `Escape`, because a
