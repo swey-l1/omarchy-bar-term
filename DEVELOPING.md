@@ -91,6 +91,15 @@ pad; restart the shell.
 - **Keystrokes are queued through one Process, never fire-and-forget.** Two detached calls
   can land in either order, and a shell that receives "l" then "s" when you typed "ls" is
   worse than a slow one. Consecutive characters coalesce into a single `type`.
+- **The session is sized to the pad, and the pad measures itself.** A session wider than
+  the pad wraps every full-width line into a ragged remnant underneath it, which is what a
+  TUI's boxes and rules turn into: running anything full-screen in here was unreadable
+  until `size` existed. `attach` hands sizing back to the terminal that attaches, and the
+  pad takes it again next time it looks.
+- **A binding that calls a method never re-evaluates.** `padCols` used
+  `FontMetrics.advanceWidth("M")` and kept answering for the font it had before the family
+  resolved, sizing every session to 30 columns. Use a *property* -- `averageCharacterWidth`
+  -- and the binding updates. The same trap as `Instantiator.objectAt()` below.
 - **A Timer cannot be a direct child of the pad's root.** `KeyboardPanel`'s default
   property is a list of items, so it fails to load with "Cannot assign object of type
   QQmlTimer to list property contentItem" and the widget vanishes from the bar. Put

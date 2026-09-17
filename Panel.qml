@@ -36,6 +36,8 @@ Theme {
     workdir: cfg.workdir
     maxLines: cfg.maxLines
     open: root.opened
+    cols: root.padCols
+    rows: root.padRows
   }
 
   property int activeTab: 0

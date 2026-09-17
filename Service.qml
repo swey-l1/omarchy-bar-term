@@ -147,6 +147,16 @@ Item {
   function restart()   { if (active) { verb("restart", active.name); active.lines = []; captureSoon.restart() } }
   function attach()    { if (active) verb("attach", active.name) }
 
+  // Sent when the pad opens and when it looks at a different session, which is
+  // every moment the size could be wrong. Attaching a terminal hands sizing
+  // back to that terminal; this pulls it to the pad's width again afterwards.
+  property int cols: 74
+  property int rows: 30
+  function resize() {
+    if (active && cols > 0 && rows > 0)
+      fire("size " + Util.shellQuote(active.name) + " " + cols + " " + rows)
+  }
+
   // ---- reading back --------------------------------------------------------
 
   // Quoted one by one: a session the user made can be called anything.
@@ -260,6 +270,6 @@ Item {
 
   // Switching tabs shows the new one's screen straight away; the old capture
   // belongs to a tab nobody is looking at any more.
-  onActiveTabChanged: captureSoon.restart()
-  onOpenChanged: if (open) captureSoon.restart()
+  onActiveTabChanged: { resize(); captureSoon.restart() }
+  onOpenChanged: if (open) { resize(); captureSoon.restart() }
 }

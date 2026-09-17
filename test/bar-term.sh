@@ -80,6 +80,18 @@ check "capture: drops the blank rows that are just pane height" "one
 two" "$out"
 contains "capture: reaches back through the scrollback" "-S -50" "$(called)"
 
+# ---- sizing it to the pad --------------------------------------------------
+run size FAKE_SESSIONS=$'bar-term-1\tbash\t/tmp' -- size bar-term-1 75 19
+contains "size: makes the session the pad's size" "resize-window -t bar-term-1 -x 75 -y 19" "$(called)"
+
+run sizebad FAKE_SESSIONS=$'bar-term-1\tbash\t/tmp' -- size bar-term-1 75
+check "size without both numbers is an error" "2" "$status"
+
+# Attaching hands sizing back, or the terminal inherits a window narrower than
+# it is and sits in a box.
+run attachsize FAKE_SESSIONS=$'bar-term-1\tbash\t/tmp' -- attach bar-term-1
+contains "attach: gives sizing back to whatever attaches" "set-window-option -t bar-term-1 window-size latest" "$(called)"
+
 # ---- what every tab is doing, in one call ----------------------------------
 mkdir -p "$tmp/bar-term" && printf '3' > "$tmp/bar-term/bar-term-1.rc"
 run states FAKE_SESSIONS="bar-term-1	bash	/home/you/src

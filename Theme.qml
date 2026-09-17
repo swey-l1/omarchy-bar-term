@@ -74,4 +74,22 @@ Item {
   // is the one place on the pad with a fixed-pitch face.
   readonly property string monoFamily: "monospace"
   readonly property int monoSize: 9
+
+  // How much of a terminal actually fits, measured rather than guessed. The
+  // session is sized to this: a session wider than the pad wraps every
+  // full-width line into a ragged remnant underneath it, which is what a TUI's
+  // boxes turn into and what made running one in here unreadable.
+  FontMetrics {
+    id: monoMetrics
+    font.family: monoFamily
+    font.pixelSize: monoSize
+  }
+  // averageCharacterWidth, not advanceWidth("M"): the second is a *method*, and a
+  // binding that calls one does not re-evaluate when the object changes, so it
+  // answered for the default font it had before the family resolved and sized
+  // every session to 30 columns. For a fixed-pitch face the average is the cell.
+  readonly property int padCols: Math.max(20, Math.floor((padWidth - inset * 2)
+                                                         / Math.max(1, monoMetrics.averageCharacterWidth)))
+  readonly property int padRows: Math.max(8, Math.floor((outputHeight - inset * 2)
+                                                        / Math.max(1, monoMetrics.height)))
 }

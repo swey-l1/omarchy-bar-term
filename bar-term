@@ -12,6 +12,7 @@
 #   bar-term type <name> <text>     type text into it, no Enter
 #   bar-term key <name> <key>...    press named keys in it: Enter, Tab, C-c, Up
 #   bar-term capture <name> [lines] print what its screen says
+#   bar-term size <name> <c> <r>    make the session that many columns and rows
 #   bar-term states <name>...       a line per name, in order: "<i> idle|running|gone <exit> <cwd>"
 #   bar-term interrupt <name>       Ctrl+C into it
 #   bar-term reset <name>           clear its screen and scrollback
@@ -122,6 +123,20 @@ case "${1:-}" in
     "$TMUX_BIN" send-keys -t "$s" -- "$@"
     ;;
 
+  size)
+    need_name "${2:-}"; have_tmux || exit 127
+    [ -n "${3:-}" ] && [ -n "${4:-}" ] || usage
+    ensure "$2" >/dev/null
+    # The pad shows a fixed number of columns, and a session wider than that
+    # wraps every full-width line into a ragged remnant underneath it -- which
+    # is what a TUI's boxes and rules turn into. Sizing the session to the pad
+    # is the difference between reading a program and squinting at it.
+    #
+    # This sets window-size to manual, so an attached terminal no longer
+    # resizes it; `attach` hands that back before opening one.
+    "$TMUX_BIN" resize-window -t "$2" -x "$3" -y "$4" 2>/dev/null
+    ;;
+
   capture)
     need_name "${2:-}"; have_tmux || exit 127
     lines=${3:-200}
@@ -194,6 +209,10 @@ case "${1:-}" in
     command -v omarchy-launch-terminal >/dev/null 2>&1 || {
       echo "bar-term: omarchy-launch-terminal not found" >&2; exit 127; }
     ensure "$2" >/dev/null
+    # Give sizing back to whatever attaches: the pad sized this window to its
+    # own width, and a terminal should not inherit a window narrower than it is.
+    # The pad sets it again next time it looks.
+    "$TMUX_BIN" set-window-option -t "$2" window-size latest >/dev/null 2>&1
     # The same session, not a new shell: attaching is the point, so whatever is
     # on the pad's screen is what the terminal opens showing.
     omarchy-launch-terminal "$TMUX_BIN" attach -t "=$2"
