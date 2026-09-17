@@ -146,6 +146,16 @@ Item {
   function reset()     { if (active) { verb("reset", active.name); captureSoon.restart() } }
   function restart()   { if (active) { verb("restart", active.name); active.lines = []; captureSoon.restart() } }
   function attach()    { if (active) verb("attach", active.name) }
+  // Only reaches a program that asked for a mouse; the shim checks, because the
+  // sequence would otherwise be typed into a shell as text.
+  function wheel(dir) {
+    if (active && active.mouseMode) {
+      fire("wheel " + Util.shellQuote(active.name) + " " + dir)
+      captureSoon.restart()
+      return true
+    }
+    return false
+  }
 
   // Sent when the pad opens and when it looks at a different session, which is
   // every moment the size could be wrong. Attaching a terminal hands sizing
@@ -177,16 +187,18 @@ Item {
         var t = String(line).trim()
         if (t === "notool") { svc.haveTmux = false; return }
         svc.haveTmux = true
-        // "<n> <state> <exit> <cwd>", one line per tab. The path is whatever
-        // is left after the first three fields, so one with spaces survives.
+        // "<n> <state> <exit> <mouse> <cwd>", one line per tab. The path is
+        // whatever is left after the first four fields, so one with spaces
+        // survives.
         var f = t.split(/\s+/)
-        if (f.length < 3) return
+        if (f.length < 4) return
         var i = parseInt(f[0], 10) - 1
         if (i < 0 || i >= svc.sessions.length) return
         var s = svc.sessions[i]
         s.sessionState = f[1]
         s.lastExit = f[2] === "-" ? -1 : parseInt(f[2], 10)
-        s.cwd = f.length > 3 ? f.slice(3).join(" ") : ""
+        s.mouseMode = f[3] === "1"
+        s.cwd = f.length > 4 ? f.slice(4).join(" ") : ""
       }
     }
   }

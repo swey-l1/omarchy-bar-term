@@ -141,6 +141,20 @@ KeyboardPanel {
           font.pixelSize: panel.monoSize
         }
 
+        // Above the view rather than inside it: a Flickable eats the wheel, and
+        // this has to decide first whether the wheel is the pad's or the
+        // program's. NoButton so clicks and drags still reach the view.
+        MouseArea {
+          anchors.fill: parent
+          acceptedButtons: Qt.NoButton
+          onWheel: function(w) {
+            var dir = w.angleDelta.y > 0 ? "up" : "down"
+            // A program on the alternate screen leaves the pad nothing to
+            // scroll, so the wheel goes to it instead.
+            w.accepted = panel.wheel(dir)
+          }
+        }
+
         PadText {
           panel: pad.panel
           anchors.centerIn: parent

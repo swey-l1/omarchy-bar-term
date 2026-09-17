@@ -122,6 +122,8 @@ Theme {
 
   function pickSession() { pad.togglePicker() }
   function scrollPage(dir) { pad.scrollPage(dir) }
+  // True when the session took it, which means the pad should not also scroll.
+  function wheel(dir) { return svc.wheel(dir) }
 
   Bindings { id: bindings; panel: root }
   readonly property var keyHelp: bindings.keyHelp

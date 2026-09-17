@@ -11,9 +11,10 @@
 #   bar-term send <name> <cmd...>   type a command into it and press Enter
 #   bar-term type <name> <text>     type text into it, no Enter
 #   bar-term key <name> <key>...    press named keys in it: Enter, Tab, C-c, Up
+#   bar-term wheel <name> up|down   scroll the program running in it, if it takes a mouse
 #   bar-term capture <name> [lines] print what its screen says
 #   bar-term size <name> <c> <r>    make the session that many columns and rows
-#   bar-term states <name>...       a line per name, in order: "<i> idle|running|gone <exit> <cwd>"
+#   bar-term states <name>...       per name, in order: "<i> idle|running|gone <exit> <mouse> <cwd>"
 #   bar-term interrupt <name>       Ctrl+C into it
 #   bar-term reset <name>           clear its screen and scrollback
 #   bar-term restart <name>         kill it and make a fresh one
@@ -137,6 +138,27 @@ case "${1:-}" in
     "$TMUX_BIN" resize-window -t "$2" -x "$3" -y "$4" 2>/dev/null
     ;;
 
+  wheel)
+    need_name "${2:-}"; have_tmux || exit 127
+    case "${3:-}" in up|down) ;; *) usage ;; esac
+    # A full-screen program draws on the alternate screen, which tmux keeps no
+    # history for: there is nothing for the pad to scroll, and the thing that
+    # should move is the program's own view. If it asked for a mouse, it gets
+    # one -- and if it did not, this does nothing, because the sequence would
+    # otherwise be typed into it as text.
+    [ "$("$TMUX_BIN" display-message -p -t "$2" '#{mouse_any_flag}' 2>/dev/null)" = "1" ] || exit 0
+    # SGR mouse: button 64 is wheel up, 65 is wheel down, at a position in the
+    # middle of the pane so it lands on whatever is scrollable.
+    btn=64; [ "$3" = "down" ] && btn=65
+    col=$(( $("$TMUX_BIN" display-message -p -t "$2" '#{pane_width}' 2>/dev/null) / 2 ))
+    row=$(( $("$TMUX_BIN" display-message -p -t "$2" '#{pane_height}' 2>/dev/null) / 2 ))
+    n=${4:-3}
+    i=0; while [ "$i" -lt "$n" ]; do
+      "$TMUX_BIN" send-keys -t "$2" -l -- "$(printf '\033[<%d;%d;%dM' "$btn" "$col" "$row")"
+      i=$((i+1))
+    done
+    ;;
+
   capture)
     need_name "${2:-}"; have_tmux || exit 127
     lines=${3:-200}
@@ -161,24 +183,26 @@ case "${1:-}" in
     shift; [ $# -gt 0 ] || usage
     # One call for every tab rather than one per tab: this runs on a timer, and
     # four processes a tick to draw four dots is not a reasonable price.
-    live=$("$TMUX_BIN" list-sessions -F '#{session_name}	#{pane_current_command}	#{pane_current_path}' 2>/dev/null)
+    live=$("$TMUX_BIN" list-sessions -F '#{session_name}	#{pane_current_command}	#{mouse_any_flag}	#{pane_current_path}' 2>/dev/null)
     i=0
     for s in "$@"; do
       i=$((i+1))
       line=$(printf '%s\n' "$live" | grep -m1 -F "$(printf '%s\t' "$s")")
       if [ -z "$line" ]; then
-        echo "$i gone - -"
+        echo "$i gone - 0 -"
         continue
       fi
       rest=${line#*$'\t'}
       cmd=${rest%%$'\t'*}
+      rest=${rest#*$'\t'}
+      mouse=${rest%%$'\t'*}
       path=${rest#*$'\t'}
       rc=$(cat "$(rc_file "$s")" 2>/dev/null); rc=${rc:--}
       # The pane's foreground command is the shell itself exactly when nothing
       # is running in it, which is the only "busy" signal a session gives.
       case "$cmd" in
-        bash|sh|zsh|fish|-bash) echo "$i idle $rc $path" ;;
-        *)                      echo "$i running $rc $path" ;;
+        bash|sh|zsh|fish|-bash) echo "$i idle $rc $mouse $path" ;;
+        *)                      echo "$i running $rc $mouse $path" ;;
       esac
     done
     ;;

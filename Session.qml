@@ -29,6 +29,12 @@ Item {
   })
   property string sessionState: stateName.gone
 
+  // Whether whatever is running in there asked for a mouse. A full-screen
+  // program draws on the alternate screen, which tmux keeps no history for, so
+  // the pad has one screenful and nothing to scroll: the wheel belongs to the
+  // program instead.
+  property bool mouseMode: false
+
   // The last command's exit status, read from the session's own shell through
   // the rc file. -1 means nothing has finished in it yet.
   property int lastExit: -1
