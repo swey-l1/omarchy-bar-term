@@ -251,6 +251,11 @@ is a good window onto a shell and a poor one onto a full-screen program: colours
 positioning and anything that redraws itself will look flat or half-finished. Completion
 menus and `Ctrl+R` render as plain rows -- readable, but not pretty.
 
+A full-screen program also leaves no scrollback to read: it draws on the alternate screen,
+which tmux keeps no history for, so there is one screenful and no more. The wheel is passed
+to the program in that case, so it scrolls its own view; over a shell, the wheel scrolls
+the pad's scrollback as you would expect.
+
 It is not a limit on what you can run. The session is a real shell, and `Alt+T` is always
 one key away.
 

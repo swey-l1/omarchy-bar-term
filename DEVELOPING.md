@@ -91,6 +91,11 @@ pad; restart the shell.
 - **Keystrokes are queued through one Process, never fire-and-forget.** Two detached calls
   can land in either order, and a shell that receives "l" then "s" when you typed "ls" is
   worse than a slow one. Consecutive characters coalesce into a single `type`.
+- **A full-screen program leaves no scrollback.** It draws on the alternate screen, which
+  tmux keeps no history for, so the pad has one screenful and scrolling it does nothing --
+  which reads as a bug and is not one. The wheel is sent to the program instead when
+  `mouse_any_flag` says it asked for a mouse; a shell session scrolls the pad as before.
+  The escape sequence must never reach a shell, which would type it as text.
 - **The session is sized to the pad, and the pad measures itself.** A session wider than
   the pad wraps every full-width line into a ragged remnant underneath it, which is what a
   TUI's boxes and rules turn into: running anything full-screen in here was unreadable
