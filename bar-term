@@ -40,28 +40,24 @@ COLS="${COLS:-72}"
 ROWS="${ROWS:-40}"
 # Where the per-session exit-status files live.
 #
-# These files are truncated by each session's shell on every prompt, so the
-# directory holding them has to be one only this user can write. It used to fall
-# back to /tmp/bar-term, which any local user can create first: leave a symlink
-# named after a session in it and the victim's own shell overwrites whatever the
-# link points at, on every prompt. The directory is therefore checked rather
-# than assumed, and when it cannot be made safe the widget runs without exit
-# statuses instead of writing somewhere it should not.
+# Each session's shell rewrites its file on every prompt, so the directory has to
+# be one only this user can write, and it is checked rather than assumed. When it
+# cannot be made safe the widget runs without exit statuses instead of writing
+# somewhere it should not.
 state_dir() {
   local base dir
-  # XDG_RUNTIME_DIR is per-user and 0700 by definition, but only if it is really
-  # ours: an inherited or spoofed value is exactly the case being defended.
+  # XDG_RUNTIME_DIR is per-user and 0700 by definition, but only when it really
+  # is ours; an inherited or unset value is why the rest of this exists.
   if [ -n "${XDG_RUNTIME_DIR:-}" ] && [ ! -L "$XDG_RUNTIME_DIR" ] \
      && [ -d "$XDG_RUNTIME_DIR" ] && [ -O "$XDG_RUNTIME_DIR" ] && [ -w "$XDG_RUNTIME_DIR" ]; then
     dir="$XDG_RUNTIME_DIR/bar-term"
   else
-    # Per-uid, so two users on one machine do not collide and neither can sit
-    # on the other's name. Still predictable, which is why it is checked below.
+    # Per-uid, so two users on one machine never share a path. Still
+    # predictable, which is why it is checked below.
     dir="${TMPDIR:-/tmp}/bar-term-$(id -u)"
   fi
 
-  # A symlink here is the attack; never follow one, and never adopt a directory
-  # somebody else owns or that anyone else can write.
+  # Never follow a link, and never adopt a directory this user does not own.
   [ -L "$dir" ] && return 1
   if [ ! -d "$dir" ]; then
     mkdir -m 700 "$dir" 2>/dev/null || return 1

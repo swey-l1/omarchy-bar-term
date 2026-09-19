@@ -12,11 +12,8 @@ __bar_term_status() {
   local rc=$?
   [ -n "${BAR_TERM_RC_FILE:-}" ] || return
 
-  # Never write through a link. The directory this lives in is checked by the
-  # shim to be one only this user can write, and this is the second lock on the
-  # same door: a redirection follows a symlink and truncates whatever is at the
-  # end of it, which would make this shell overwrite its own user's files on
-  # every prompt.
+  # Never write through a link: the shim checks the directory, and this is the
+  # second lock on the same door.
   [ -L "$BAR_TERM_RC_FILE" ] && return
 
   # Written beside it and moved into place, so a reader never sees the file
