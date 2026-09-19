@@ -80,6 +80,15 @@ pad; restart the shell.
 - **Poll for every tab at once.** `states` answers for all of them in one tmux call, and
   only the visible tab has its screen captured. This runs on a timer all day; four
   processes a tick to draw four dots is not a price worth paying.
+- **The status files live somewhere only this user can write, and that is checked.** They
+  are truncated by each session's shell on every prompt, so a directory another local user
+  can pre-create is a way to make that shell overwrite its own user's files: leave a
+  symlink named after a session and every prompt writes through it. `state_dir` refuses a
+  symlink, refuses a directory it does not own, forces 0700, and falls back to a per-uid
+  path rather than a shared one. When none of that can be satisfied the widget runs with
+  no exit statuses rather than writing somewhere unsafe, and `session-rc.bash` writes
+  beside the file and moves it into place rather than redirecting through whatever is
+  there.
 - **Exit status comes from the session's own shell.** `session-rc.bash` sources the user's
   `~/.bashrc` and prepends one entry to `PROMPT_COMMAND` that writes `$?` to a file under
   `$XDG_RUNTIME_DIR/bar-term/`, named after the session. It must stay invisible: the user can be attached to that

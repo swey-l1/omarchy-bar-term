@@ -80,6 +80,37 @@ check "capture: drops the blank rows that are just pane height" "one
 two" "$out"
 contains "capture: reaches back through the scrollback" "-S -50" "$(called)"
 
+# ---- the status file cannot be turned into a weapon -------------------------
+# The session's shell truncates this file on every prompt. If it lived somewhere
+# another local user could pre-create, a symlink left there would make that
+# shell overwrite one of its own user's files, over and over.
+rc_hook() {  # run the rc file's status hook with a given target
+  HOME="$tmp/home" BAR_TERM_RC_FILE="$1" bash -c '. "$0"; false; __bar_term_status' \
+    "$here/../session-rc.bash" 2>/dev/null
+}
+mkdir -p "$tmp/home"
+
+printf 'PRECIOUS' > "$tmp/victim"
+ln -sf "$tmp/victim" "$tmp/link.rc"
+rc_hook "$tmp/link.rc"
+check "the status hook does not write through a symlink" "PRECIOUS" "$(cat "$tmp/victim")"
+check "and leaves the link alone rather than replacing it" "yes" "$([ -L "$tmp/link.rc" ] && echo yes)"
+
+rc_hook "$tmp/plain.rc"
+check "the status hook writes the status to a real file" "1" "$(cat "$tmp/plain.rc" 2>/dev/null)"
+check "and leaves no temporary file beside it" "0" "$(ls "$tmp"/plain.rc.* 2>/dev/null | wc -l)"
+
+# The directory the shim chooses has to be one only this user can write.
+mkdir -m 700 -p "$tmp/rt"
+run statedir XDG_RUNTIME_DIR="$tmp/rt" -- ensure bar-term-9
+contains "a fresh session gets a status file under a private directory" "BAR_TERM_RC_FILE=" "$(called)"
+check "which is created private to this user" "700" "$(stat -c '%a' "$tmp/rt/bar-term" 2>/dev/null)"
+
+ln -sfn /tmp "$tmp/evil"
+run statelink XDG_RUNTIME_DIR="$tmp/evil" TMPDIR=/dev/null -- ensure bar-term-9
+absent "nowhere safe to write means no status file, not an unsafe one" "BAR_TERM_RC_FILE=" "$(called)"
+contains "and the session is still made" "new-session" "$(called)"
+
 # ---- the wheel, when a program owns the screen ------------------------------
 # A full-screen program draws on the alternate screen, which tmux keeps no
 # history for: the pad has nothing to scroll and the wheel belongs to the

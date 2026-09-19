@@ -38,11 +38,50 @@ WORKDIR="${WORKDIR:-$HOME}"
 # match what the pad can show rather than a terminal's idea of a screen.
 COLS="${COLS:-72}"
 ROWS="${ROWS:-40}"
-STATE_DIR="${XDG_RUNTIME_DIR:-/tmp}/bar-term"
+# Where the per-session exit-status files live.
+#
+# These files are truncated by each session's shell on every prompt, so the
+# directory holding them has to be one only this user can write. It used to fall
+# back to /tmp/bar-term, which any local user can create first: leave a symlink
+# named after a session in it and the victim's own shell overwrites whatever the
+# link points at, on every prompt. The directory is therefore checked rather
+# than assumed, and when it cannot be made safe the widget runs without exit
+# statuses instead of writing somewhere it should not.
+state_dir() {
+  local base dir
+  # XDG_RUNTIME_DIR is per-user and 0700 by definition, but only if it is really
+  # ours: an inherited or spoofed value is exactly the case being defended.
+  if [ -n "${XDG_RUNTIME_DIR:-}" ] && [ ! -L "$XDG_RUNTIME_DIR" ] \
+     && [ -d "$XDG_RUNTIME_DIR" ] && [ -O "$XDG_RUNTIME_DIR" ] && [ -w "$XDG_RUNTIME_DIR" ]; then
+    dir="$XDG_RUNTIME_DIR/bar-term"
+  else
+    # Per-uid, so two users on one machine do not collide and neither can sit
+    # on the other's name. Still predictable, which is why it is checked below.
+    dir="${TMPDIR:-/tmp}/bar-term-$(id -u)"
+  fi
+
+  # A symlink here is the attack; never follow one, and never adopt a directory
+  # somebody else owns or that anyone else can write.
+  [ -L "$dir" ] && return 1
+  if [ ! -d "$dir" ]; then
+    mkdir -m 700 "$dir" 2>/dev/null || return 1
+  fi
+  [ -O "$dir" ] || return 1
+  case "$(stat -c '%a' "$dir" 2>/dev/null)" in
+    700) ;;
+    *) chmod 700 "$dir" 2>/dev/null || return 1 ;;
+  esac
+  printf '%s' "$dir"
+}
 
 # The exit-status file is named after the session, so it has to survive whatever
-# characters a session name is allowed to have.
-rc_file() { echo "$STATE_DIR/$(printf '%s' "$1" | tr -c 'A-Za-z0-9_.-' '_').rc"; }
+# characters a session name is allowed to have. Empty when there is nowhere safe
+# to put it, and every caller treats that as "no exit status", not as an error.
+rc_file() {
+  local dir; dir=$(state_dir) || return 0
+  [ -n "$dir" ] || return 0
+  printf '%s/%s.rc' "$dir" "$(printf '%s' "$1" | tr -c 'A-Za-z0-9_.-' '_')"
+}
 
 need_name() { [ -n "${1:-}" ] || { echo "bar-term: need a session name" >&2; exit 2; }; }
 
@@ -59,11 +98,14 @@ have_tmux() { command -v "$TMUX_BIN" >/dev/null 2>&1; }
 ensure() {
   local s=$1
   "$TMUX_BIN" has-session -t "=$s" 2>/dev/null && { echo "$s"; return 0; }
-  mkdir -p "$STATE_DIR"
   # A login-ish interactive bash with our rc file, which sources the user's own
-  # and adds nothing they can see. -c is where it starts.
+  # and adds nothing they can see. -c is where it starts. The rc file's path is
+  # passed only when there is a safe directory for it; without one the session
+  # runs exactly the same, it just does not report exit statuses.
+  local rc env=""; rc=$(rc_file "$s")
+  [ -n "$rc" ] && env="BAR_TERM_RC_FILE=$(printf %q "$rc") "
   "$TMUX_BIN" new-session -d -s "$s" -c "$WORKDIR" -x "$COLS" -y "$ROWS" \
-    "BAR_TERM_RC_FILE=$(printf %q "$(rc_file "$s")") exec bash --rcfile $(printf %q "$here/session-rc.bash") -i"
+    "${env}exec bash --rcfile $(printf %q "$here/session-rc.bash") -i"
   # Wait for the shell to have drawn its prompt before anyone types into it.
   # Keys sent to a pty whose shell has not read them yet are echoed raw and then
   # read back as input, so the first command of a session appeared twice: once
@@ -224,7 +266,7 @@ case "${1:-}" in
   restart)
     need_name "${2:-}"; have_tmux || exit 127
     "$TMUX_BIN" kill-session -t "=$2" 2>/dev/null
-    rm -f "$(rc_file "$2")"
+    rc=$(rc_file "$2"); [ -n "$rc" ] && rm -f "$rc"
     ensure "$2"
     ;;
 
