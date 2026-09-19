@@ -7,6 +7,13 @@ Text {
   // The Panel this belongs to, for theming.
   property var panel: null
 
+  // Everything this widget draws is text somebody else produced: the output of
+  // a command, a path, a session name. Qt's default is AutoText, which detects
+  // markup and renders it, so a line containing <b> came out bold with the tags
+  // eaten, and a line containing <img src> would have been fetched. Plain means
+  // what it says.
+  textFormat: Text.PlainText
+
   color: panel.textColour
   font.family: panel.fontFamily
 }

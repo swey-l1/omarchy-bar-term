@@ -130,6 +130,11 @@ pad; restart the shell.
   `onObjectAdded`/`onObjectRemoved` rather than read back with `Instantiator.objectAt()`,
   which is a plain function: a binding on it would not re-evaluate when the active tab
   changed.
+- **Everything the pad draws is somebody else's text, so it is drawn as text.** `PadText`
+  sets `textFormat: Text.PlainText`. Qt's default is `AutoText`, which detects markup and
+  renders it: a line of output containing `<b>` came out bold with the tags eaten, and one
+  containing `<img src>` would have been fetched. A terminal that eats angle brackets is
+  also simply wrong for anyone reading XML or C++.
 - **Output is bounded by what is read, not by what is produced.** tmux keeps the
   scrollback; the pad asks for the last `maxLines` of it and draws that in a view of fixed
   height. A command that floods the session is the session's business, exactly as it would

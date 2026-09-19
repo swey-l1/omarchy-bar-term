@@ -57,16 +57,14 @@ state_dir() {
     dir="${TMPDIR:-/tmp}/bar-term-$(id -u)"
   fi
 
-  # Never follow a link, and never adopt a directory this user does not own.
-  [ -L "$dir" ] && return 1
-  if [ ! -d "$dir" ]; then
-    mkdir -m 700 "$dir" 2>/dev/null || return 1
-  fi
-  [ -O "$dir" ] || return 1
-  case "$(stat -c '%a' "$dir" 2>/dev/null)" in
-    700) ;;
-    *) chmod 700 "$dir" 2>/dev/null || return 1 ;;
-  esac
+  [ -d "$dir" ] || mkdir -m 700 "$dir" 2>/dev/null || return 1
+
+  # One check, and stat does not follow links: the entry has to be a directory
+  # in its own right, owned by this user, and private. Asking three separate
+  # questions left room for the answer to change between them, and -O follows a
+  # link where this does not.
+  [ "$(stat -c '%F %u %a' "$dir" 2>/dev/null)" = "directory $(id -u) 700" ] || return 1
+
   printf '%s' "$dir"
 }
 
